@@ -1,86 +1,54 @@
 [ORG 0x7c00]      ; add to offsets
-   xor ax, ax    ; make it zero
+   jmp start
+
+   %include "print.inc"
+
+start:   xor ax, ax   ; make it zero
    mov ds, ax   ; DS=0
    mov ss, ax   ; stack starts at 0
-   mov sp, 0x9c00   ; 2000h past code start
-
-   cld
+   mov sp, 0x9c00   ; 200h past code start
 
    mov ax, 0xb800   ; text video memory
    mov es, ax
 
-   mov si, msg   ; show text string
-   call sprint
+   cli      ;no interruptions
+   mov bx, 0x09   ;hardware interrupt #
+   shl bx, 2   ;multiply by 4
+   xor ax, ax
+   mov gs, ax   ;start of memory
+   mov [gs:bx], word keyhandler
+   mov [gs:bx+2], ds ; segment
+   sti
 
-   mov ax, 0xb800   ; look at video mem
-   mov gs, ax
-   mov bx, 0x0000   ; 'W'=57 attrib=0F
-   mov ax, [gs:bx]
+   jmp $      ; loop forever
 
-   mov  word [reg16], ax ;look at register
+keyhandler:
+   in al, 0x60   ; get key data
+   mov bl, al   ; save it
+   mov byte [port60], al
+
+   in al, 0x61   ; keybrd control
+   mov ah, al
+   or al, 0x80   ; disable bit 7
+   out 0x61, al   ; send it back
+   xchg ah, al   ; get original
+   out 0x61, al   ; send that back
+
+   mov al, 0x20   ; End of Interrupt
+   out 0x20, al   ;
+
+   and bl, 0x80   ; key released
+   jnz done   ; don't repeat
+
+   mov ax, [port60]
+   mov  word [reg16], ax
    call printreg16
 
-hang:
-   jmp hang
+done:
+   iret
 
-;----------------------
-dochar:   call cprint         ; print one character
-sprint:   lodsb      ; string char to AL
-   cmp al, 0
-   jne dochar   ; else, we're done
-   add byte [ypos], 1   ;down one row
-   mov byte [xpos], 0   ;back to left
-   ret
+port60   dw 0
 
-cprint:   mov ah, 0x0F   ; attrib = white on black
-   mov cx, ax    ; save char/attribute
-   movzx ax, byte [ypos]
-   mov dx, 160   ; 2 bytes (char/attrib)
-   mul dx      ; for 80 columns
-   movzx bx, byte [xpos]
-   shl bx, 1    ; times 2 to skip attrib
-
-   mov di, 0        ; start of video memory
-   add di, ax      ; add y offset
-   add di, bx      ; add x offset
-
-   mov ax, cx        ; restore char/attribute
-   stosw              ; write char/attribute
-   add byte [xpos], 1  ; advance to right
-
-   ret
-
-;------------------------------------
-
-printreg16:
-   mov di, outstr16
-   mov ax, [reg16]
-   mov si, hexstr
-   mov cx, 4   ;four places
-hexloop:
-   rol ax, 4   ;leftmost will
-   mov bx, ax   ; become
-   and bx, 0x0f   ; rightmost
-   mov bl, [si + bx];index into hexstr
-   mov [di], bl
-   inc di
-   dec cx
-   jnz hexloop
-
-   mov si, outstr16
-   call sprint
-
-   ret
-
-;------------------------------------
-
-xpos   db 0
-ypos   db 0
-hexstr   db '0123456789ABCDEF'
-outstr16   db '0000', 0  ;register value string
-reg16   dw    0  ; pass values to printreg16
-msg   db "What are you doing, Dave?", 0
-times 510-($-$$) db 0
-db 0x55
-db 0xAA
-;==================================
+   times 510-($-$$) db 0  ; fill sector w/ 0's
+   dw 0xAA55        ; req'd by some BIOSes
+;==========================================
