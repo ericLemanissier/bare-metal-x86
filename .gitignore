@@ -1,1 +1,5 @@
 boot.bin
+opt/*
+toolchain/build-*/*
+toolchain/binutils-*
+toolchain/gcc-*
