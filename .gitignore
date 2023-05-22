@@ -2,5 +2,4 @@ opt/*
 toolchain/build-*/*
 toolchain/binutils-*
 toolchain/gcc-*
-*.o
-*.bin
+sysroot
