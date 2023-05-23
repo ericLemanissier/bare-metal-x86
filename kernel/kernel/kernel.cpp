@@ -112,6 +112,9 @@ void terminal_rect(const Rectangle &rect, Outline o = Outline::Single)
 
 }
 
+#include "kernel/ll.h"
+#include "kernel/serial.h"
+
 
 enum vga_color {
 	VGA_COLOR_BLACK = 0,
@@ -136,6 +139,8 @@ void kernel_main(void)
 {
 	/* Initialize terminal interface */
 	terminal_initialize();
+
+	disable_cursor();
 
 	puts("Hello from puts\n   and it works!\n");
 
@@ -163,4 +168,12 @@ void kernel_main(void)
 	terminal_rect(Rectangle{Point{9, 9}, Size{12,10}}, Outline::Single);
 	terminal_rect(Rectangle{Point{10, 10}, Size{5,8}}, Outline::Double);
 	terminal_rect(Rectangle{Point{15, 10}, Size{5,3}}, Outline::Single);
+
+	init_serial();
+
+	write_serial('h');
+	write_serial('e');
+	write_serial('l');
+	write_serial('l');
+	write_serial('o');
 }
