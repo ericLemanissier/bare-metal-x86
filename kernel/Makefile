@@ -4,6 +4,7 @@ HOSTARCH!=../target-triplet-to-arch.sh $(HOST)
 
 CFLAGS?=-O2 -g
 CPPFLAGS?=
+CXXFLAGS?=-O2 -g
 LDFLAGS?=
 LIBS?=
 
@@ -14,8 +15,9 @@ BOOTDIR?=$(EXEC_PREFIX)/boot
 INCLUDEDIR?=$(PREFIX)/include
 
 
-CFLAGS:=$(CFLAGS) -D__is_kernel -Iinclude -ffreestanding -Wall -Wextra -Wimplicit
-CPPFLAGS:=$(CPPFLAGS) -D__is_kernel -Iinclude -ffreestanding -Wall -Wextra -Wimplicit -fno-exceptions -fno-rtti
+CFLAGS:=$(CFLAGS) -ffreestanding -Wall -Wextra -Wimplicit
+CPPFLAGS:=$(CPPFLAGS) -D__is_kernel -Iinclude
+CXXFLAGS:=$(CXXFLAGS) -ffreestanding -Wall -Wextra -fno-exceptions -fno-rtti
 LDFLAGS:=$(LDFLAGS) -ffreestanding -O2
 LIBS:=$(LIBS) -nostdlib -lk -lgcc
 
@@ -25,6 +27,7 @@ include $(ARCHDIR)/make.config
 
 CFLAGS:=$(CFLAGS) $(KERNEL_ARCH_CFLAGS)
 CPPFLAGS:=$(CPPFLAGS) $(KERNEL_ARCH_CPPFLAGS)
+CXXFLAGS:=$(CXXFLAGS) $(KERNEL_ARCH_CFLAGS)
 LDFLAGS:=$(LDFLAGS) $(KERNEL_ARCH_LDFLAGS)
 LIBS:=$(LIBS) $(KERNEL_ARCH_LIBS)
 
@@ -59,11 +62,6 @@ myos.kernel: $(OBJS) $(ARCHDIR)/linker.ld
 $(ARCHDIR)/crtbegin.o $(ARCHDIR)/crtend.o:
 	OBJ=`$(CC) $(CFLAGS) $(LDFLAGS) -print-file-name=$(@F)` && cp "$$OBJ" $@
 
-.c.o:
-	$(CC) -MD -c $< -o $@ -std=gnu11 $(CFLAGS) $(CPPFLAGS)
-
-.S.o:
-	$(CC) -MD -c $< -o $@ $(CFLAGS) $(CPPFLAGS)
 
 clean:
 	rm -f myos.kernel
