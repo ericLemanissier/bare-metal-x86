@@ -64,20 +64,15 @@ struct Rectangle
 	}
 };
 
-
-void terminal_write_hex_nibble(uint8_t n)
-{
-	if(n > 9)
-		terminal_putchar('A' + n - 10);
-	else
-		terminal_putchar('0' + n);
-}
-
 void terminal_writehex(size_t h)
 {
 	if(const auto high = h / 16)
 		terminal_writehex(high);
-	terminal_write_hex_nibble(h % 16);
+	const auto n = h % 16;
+	if(n > 9)
+		terminal_putchar('A' + n - 10);
+	else
+		terminal_putchar('0' + n);
 }
 
 enum class Outline
@@ -114,6 +109,7 @@ void terminal_rect(const Rectangle &rect, Outline o = Outline::Single)
 
 #include "kernel/ll.h"
 #include "kernel/serial.h"
+#include "kernel/debug.h"
 
 
 enum vga_color {
@@ -141,6 +137,8 @@ void kernel_main(void)
 	terminal_initialize();
 
 	disable_cursor();
+
+	DEBUG_MESSAGE("booting kernel");
 
 	puts("Hello from puts\n   and it works!\n");
 
@@ -170,10 +168,16 @@ void kernel_main(void)
 	terminal_rect(Rectangle{Point{15, 10}, Size{5,3}}, Outline::Single);
 
 	init_serial();
+	DEBUG_MESSAGE("Hello debug world!");
 
-	write_serial('h');
-	write_serial('e');
-	write_serial('l');
-	write_serial('l');
-	write_serial('o');
+	uint8_t last_d = 0;
+	while (1)
+    {
+		uint8_t d = inb(0x60);
+		if(d != last_d)
+		{
+			terminal_writehex(d);terminal_writestring("\n");
+			last_d = d;
+		}
+	}
 }
