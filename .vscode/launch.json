@@ -1,0 +1,32 @@
+{
+    "version": "0.2.0",
+    "configurations": [{
+        "name": "Launch with GDB",
+        "type": "cppdbg",
+        "request": "launch",
+        "program": "${workspaceRoot}/sysroot/boot/myos.kernel",
+        "cwd": "${workspaceRoot}",
+        "args": [],
+        "targetArchitecture": "x86",
+        "MIMode": "gdb",
+        "miDebuggerPath": "",
+        "miDebuggerArgs": "",
+        "customLaunchSetupCommands": [
+            {
+                "text": "target remote localhost:1234",
+                "description": "Connect to QEMU remote debugger"
+            }
+        ],
+        "setupCommands": [
+            {
+                "text": "file ${workspaceRoot}/sysroot/boot/myos.kernel",
+                "description": "Load binary."
+            },
+            {
+                "text": "break kernel_main",
+                "description": "Break on main.",
+            }
+        ],
+        "preLaunchTask": "Launch QEMU"
+    }]
+}
