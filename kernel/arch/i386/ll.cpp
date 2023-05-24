@@ -56,6 +56,10 @@ unsigned long save_irqdisable(void)
     asm volatile ("pushf\n\tcli\n\tpop %0" : "=r"(flags) : : "memory");
     return flags;
 }
+void enable_interrupts(void)
+{
+    asm volatile("sti");
+}
 
 void irqrestore(unsigned long flags)
 {
@@ -70,6 +74,16 @@ void lidt(void* base, uint16_t size)
     } __attribute__((packed)) IDTR = { size, base };
 
     asm ( "lidt %0" : : "m"(IDTR) );  // let the compiler choose an addressing mode
+}
+
+void lgdt(void* base, uint16_t size)
+{   // This function works in 32 and 64bit mode
+    struct {
+        uint16_t length;
+        void*    base;
+    } __attribute__((packed)) GDTR = { size, base };
+
+    asm ( "lgdt %0" : : "m"(GDTR) );  // let the compiler choose an addressing mode
 }
 
 void cpuid(int code, uint32_t* a, uint32_t* d)

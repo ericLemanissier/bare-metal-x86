@@ -110,6 +110,9 @@ void terminal_rect(const Rectangle &rect, Outline o = Outline::Single)
 #include "kernel/ll.h"
 #include "kernel/serial.h"
 #include "kernel/debug.h"
+#include "kernel/idt.h"
+#include "kernel/gdt.h"
+#include "kernel/pic.h"
 
 
 enum vga_color {
@@ -136,6 +139,11 @@ void kernel_main(void)
 	/* Initialize terminal interface */
 	terminal_initialize();
 
+	init_gdt();
+	init_idt();
+	init_pic();
+
+	enable_interrupts();
 	disable_cursor();
 
 	DEBUG_MESSAGE("booting kernel");
@@ -163,6 +171,7 @@ void kernel_main(void)
 	terminal_writestring(" 0x");terminal_writehex(256);
 	terminal_writestring(" 0x");terminal_writehex(65535);
 	terminal_writestring(" 0x");terminal_writehex(65536);
+	terminal_writestring("\n");
 	terminal_rect(Rectangle{Point{9, 9}, Size{12,10}}, Outline::Single);
 	terminal_rect(Rectangle{Point{10, 10}, Size{5,8}}, Outline::Double);
 	terminal_rect(Rectangle{Point{15, 10}, Size{5,3}}, Outline::Single);
@@ -170,14 +179,8 @@ void kernel_main(void)
 	init_serial();
 	DEBUG_MESSAGE("Hello debug world!");
 
-	uint8_t last_d = 0;
 	while (1)
     {
-		uint8_t d = inb(0x60);
-		if(d != last_d)
-		{
-			terminal_writehex(d);terminal_writestring("\n");
-			last_d = d;
-		}
+    	asm volatile ( "hlt" );
 	}
 }
