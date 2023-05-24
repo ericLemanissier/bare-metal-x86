@@ -34,6 +34,7 @@ void init_idt_desc(uint16_t select, uint32_t offset, uint16_t type, struct idtde
 #include "kernel/debug.h"
 
 extern "C" void _asm_schedule();
+extern "C" void _asm_timer();
 extern "C" void _asm_int_kbd();
 extern "C" void _asm_syscalls();
 extern "C" void _asm_exc_GP(void);
@@ -51,7 +52,7 @@ void init_idt(void)
 	init_idt_desc(0x08, (uint32_t) _asm_exc_GP, INTGATE, &kidt[13]);		/* #GP */
 	init_idt_desc(0x08, (uint32_t) _asm_exc_PF, INTGATE, &kidt[14]);     /* #PF */
 
-	init_idt_desc(0x08, (uint32_t) _asm_schedule, INTGATE, &kidt[32]);
+	init_idt_desc(0x08, (uint32_t) _asm_timer, INTGATE, &kidt[32]);
 	init_idt_desc(0x08, (uint32_t) _asm_int_kbd, INTGATE, &kidt[33]);
 
 	init_idt_desc(0x08, (uint32_t) _asm_syscalls, TRAPGATE, &kidt[48]);
@@ -69,6 +70,18 @@ extern "C" void isr_schedule_int()
 }
 
 #include "kernel/serial.h"
+
+static uint64_t ticks{};
+uint64_t get_tick()
+{
+    return ticks;
+}
+extern "C" void isr_timer_int()
+{
+    ticks++;
+	outb(0x20,0x20);
+	outb(0xA0,0x20);
+}
 
 extern "C" void isr_kbd_int()
 {

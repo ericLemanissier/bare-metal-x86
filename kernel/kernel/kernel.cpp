@@ -113,6 +113,7 @@ void terminal_rect(const Rectangle &rect, Outline o = Outline::Single)
 #include "kernel/idt.h"
 #include "kernel/gdt.h"
 #include "kernel/pic.h"
+#include "kernel/pit.h"
 
 
 enum vga_color {
@@ -142,6 +143,7 @@ void kernel_main(void)
 	init_gdt();
 	init_idt();
 	init_pic();
+	init_pit();
 
 	enable_interrupts();
 	disable_cursor();
