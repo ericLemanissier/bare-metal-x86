@@ -17,7 +17,7 @@ INCLUDEDIR?=$(PREFIX)/include
 
 CFLAGS:=$(CFLAGS) -ffreestanding -Wall -Wextra -Wimplicit
 CPPFLAGS:=$(CPPFLAGS) -D__is_kernel -Iinclude
-CXXFLAGS:=$(CXXFLAGS) -ffreestanding -Wall -Wextra -fno-exceptions -fno-rtti
+CXXFLAGS:=$(CXXFLAGS) -ffreestanding -Wall -Wextra -fno-exceptions -fno-rtti -std=c++20
 LDFLAGS:=$(LDFLAGS) -ffreestanding -O2
 LIBS:=$(LIBS) -nostdlib -lk -lgcc
 

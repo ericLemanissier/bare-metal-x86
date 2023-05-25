@@ -20,7 +20,7 @@ inline void write_serial(const char*s)
 };
 
 template<int b = 10>
-inline void write_serial(uint32_t i)
+inline void write_serial(const auto i)
 {
 	if(const auto high = i / b)
 		write_serial<b>(high);

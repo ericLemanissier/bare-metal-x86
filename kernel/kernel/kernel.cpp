@@ -1,7 +1,5 @@
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdint.h>
-#include <stdio.h>
+#include <cstddef>
+#include <cstdint>
 #include <kernel/tty.h>
 #include <kernel/multiboot.h>
 
@@ -150,22 +148,22 @@ void kernel_main(const multiboot_info *multiboot_info_pointer, uint32_t multiboo
 
 	if(multiboot_magic_value != 0x2BADB002)
 	{
-		DEBUG_MESSAGE("!!!Bad multiboot magic value!!!");
+		debug("!!!Bad multiboot magic value!!!");
 		return;
 	}
 	if(multiboot_info_pointer->flags & 0x200)
 	{
-		DEBUG_MESSAGE("bootloader name: ");
+		debug("bootloader name: ");
 		write_serial(multiboot_info_pointer->boot_loader_name);write_serial("\n");
 	}
 	if(multiboot_info_pointer->flags & 0x800)
 	{
-		DEBUG_MESSAGE("VBE info: ");
+		debug("VBE info: ");
 		write_serial<16>(multiboot_info_pointer->vbe_mode);write_serial("\n");
 	}
 	if(multiboot_info_pointer->flags & 0x1000)
 	{
-		DEBUG_MESSAGE("Frame Buffer info: ");
+		debug("Frame Buffer info: ");
 		write_serial(multiboot_info_pointer->framebuffer_width); write_serial("x");
 		write_serial(multiboot_info_pointer->framebuffer_height); write_serial(" ");
 		write_serial(multiboot_info_pointer->framebuffer_pitch); write_serial(" ");
@@ -173,16 +171,16 @@ void kernel_main(const multiboot_info *multiboot_info_pointer, uint32_t multiboo
 		switch(multiboot_info_pointer->framebuffer_type)
 		{
 		case 0:
-			DEBUG_MESSAGE("Indexed colors");
+			debug("Indexed colors");
 			break;
 		case 1:
-			DEBUG_MESSAGE("RGB colors");
+			debug("RGB colors");
 			break;
 		case 2:
-			DEBUG_MESSAGE("EGA text mode");
+			debug("EGA text mode");
 			break;
 		default:
-			DEBUG_MESSAGE("unknown framebuffer type: ");
+			debug("unknown framebuffer type: ");
     		write_serial(multiboot_info_pointer->framebuffer_type);write_serial("\n");
 		}
 
@@ -191,36 +189,31 @@ void kernel_main(const multiboot_info *multiboot_info_pointer, uint32_t multiboo
 		for(int i = 0; i < 10; i++)
 		{
 			pixel+=multiboot_info_pointer->framebuffer_pitch;
-			*reinterpret_cast<uint32_t*>(pixel) = 0xFFFFFFFF;
+			*reinterpret_cast<uint32_t*>(pixel) = 0xFFFFFF;
 		}
 		for(int i = 0; i < 20; i++)
 		{
 			pixel+=multiboot_info_pointer->framebuffer_bpp/8;
-			*reinterpret_cast<uint32_t*>(pixel) = 0xFF000000;
+			*reinterpret_cast<uint32_t*>(pixel) = 0xFF0000;
 		}
 		for(int i = 0; i < 20; i++)
 		{
 			pixel+=multiboot_info_pointer->framebuffer_bpp/8;
-			*reinterpret_cast<uint32_t*>(pixel) = 0x00FF0000;
+			*reinterpret_cast<uint32_t*>(pixel) = 0x00FF00;
 		}
 		for(int i = 0; i < 20; i++)
 		{
 			pixel+=multiboot_info_pointer->framebuffer_bpp/8;
-			*reinterpret_cast<uint32_t*>(pixel) = 0x0000FF00;
-		}
-		for(int i = 0; i < 20; i++)
-		{
-			pixel+=multiboot_info_pointer->framebuffer_bpp/8;
-			*reinterpret_cast<uint32_t*>(pixel) = 0x000000FF;
+			*reinterpret_cast<uint32_t*>(pixel) = 0x0000FF;
 		}
 	}
 
 	enable_interrupts();
 	disable_cursor();
 
-	DEBUG_MESSAGE("booting kernel");
+	debug("booting kernel");
 
-	puts("Hello from puts\n   and it works!\n");
+	//puts("Hello from puts\n   and it works!\n");
 
 	terminal_writestring("Hello, kernel World!\n");
 	terminal_setcolor(VGA_COLOR_BLUE | VGA_COLOR_WHITE << 4);
@@ -247,7 +240,7 @@ void kernel_main(const multiboot_info *multiboot_info_pointer, uint32_t multiboo
 	terminal_rect(Rectangle{Point{10, 10}, Size{5,8}}, Outline::Double);
 	terminal_rect(Rectangle{Point{15, 10}, Size{5,3}}, Outline::Single);
 
-	DEBUG_MESSAGE("Hello debug world!");
+	debug("Hello debug world!");
 
 	while (1)
     {

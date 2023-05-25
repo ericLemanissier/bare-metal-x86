@@ -85,7 +85,7 @@ extern "C" void isr_timer_int()
 
 extern "C" void isr_kbd_int()
 {
-    DEBUG_MESSAGE("Keyboard int!");
+    debug("Keyboard int!");
 
 
     uint8_t d = inb(0x60);
@@ -96,19 +96,19 @@ extern "C" void isr_kbd_int()
 }
 
 extern "C" void do_syscalls(int num){
-	DEBUG_MESSAGE("Syscall !\n");
+	debug("Syscall !\n");
     asm("hlt");
 }
 
 
 extern "C" void isr_GP_exc(void)
 {
-	DEBUG_MESSAGE("\n General protection fault !\n");
+	debug("\n General protection fault !\n");
     asm("hlt");
 }
 
 extern "C" void isr_PF_exc(void)
 {
-	DEBUG_MESSAGE("\n Protection Fault !\n");
+	debug("\n Protection Fault !\n");
     asm("hlt");
 }

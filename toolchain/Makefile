@@ -29,8 +29,10 @@ gcc:
 
 	mkdir -p build-gcc
 	cd build-gcc && \
-	../gcc-$(GCC_VERSION)/configure --target=${TARGET} --prefix="${PREFIX}" --disable-nls --enable-languages=c,c++ --without-headers && \
+	../gcc-$(GCC_VERSION)/configure --target=${TARGET} --prefix="${PREFIX}" --disable-nls --enable-languages=c,c++ --without-headers --enable-libstdcxx --disable-hosted-libstdcxx --disable-shared --disable-threads --disable-bootstrap && \
 	$(MAKE) all-gcc && \
 	$(MAKE) all-target-libgcc && \
 	$(MAKE) install-gcc && \
-	$(MAKE) install-target-libgcc
+	$(MAKE) install-target-libgcc && \
+	$(MAKE) all-target-libstdc++-v3 && \
+	$(MAKE) install-target-libstdc++-v3
