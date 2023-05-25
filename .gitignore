@@ -3,3 +3,5 @@ toolchain/build-*/*
 toolchain/binutils-*
 toolchain/gcc-*
 sysroot
+myos.iso
+isodir/*

@@ -144,6 +144,7 @@ void kernel_main(void)
 	init_idt();
 	init_pic();
 	init_pit();
+	init_serial();
 
 	enable_interrupts();
 	disable_cursor();
@@ -178,7 +179,6 @@ void kernel_main(void)
 	terminal_rect(Rectangle{Point{10, 10}, Size{5,8}}, Outline::Double);
 	terminal_rect(Rectangle{Point{15, 10}, Size{5,3}}, Outline::Single);
 
-	init_serial();
 	DEBUG_MESSAGE("Hello debug world!");
 
 	while (1)

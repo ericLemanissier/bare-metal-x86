@@ -8,7 +8,7 @@
             "command": "qemu-system-i386 -S -gdb tcp::1234 -boot d -cdrom bin/myos.iso -m 512"
         },
         "linux": {
-            "command": "qemu-system-i386 -S -gdb tcp::1234 -kernel sysroot/boot/myos.kernel -serial stdio"
+            "command": "qemu-system-i386 -S -gdb tcp::1234 -cdrom myos.iso -serial stdio"
         }
     }]
 }
