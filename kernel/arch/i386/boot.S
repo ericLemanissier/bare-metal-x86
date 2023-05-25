@@ -1,7 +1,5 @@
 /* Declare constants for the multiboot header. */
-.set ALIGN,    1<<0             /* align loaded modules on page boundaries */
-.set MEMINFO,  1<<1             /* provide memory map */
-.set FLAGS,    ALIGN | MEMINFO  /* this is the Multiboot 'flag' field */
+.set FLAGS,    0x7 /* this is the Multiboot 'flag' field */
 .set MAGIC,    0x1BADB002       /* 'magic number' lets bootloader find the header */
 .set CHECKSUM, -(MAGIC + FLAGS) /* checksum of above, to prove we are multiboot */
 
@@ -17,6 +15,15 @@ forced to be within the first 8 KiB of the kernel file.
 .long MAGIC
 .long FLAGS
 .long CHECKSUM
+.long 0
+.long 0
+.long 0
+.long 0
+.long 0
+.long 0	/* mode_type: Linear graphics mode */
+.long 0	/* width */
+.long 0	/* height */
+.long 0	/* depth */
 
 /*
 The multiboot standard does not define the value of the stack pointer register
@@ -84,6 +91,9 @@ _start:
 	stack since (pushed 0 bytes so far), so the alignment has thus been
 	preserved and the call is well defined.
 	*/
+	cli
+	pushl %eax
+	pushl %ebx
 	call kernel_main
 
 	/*

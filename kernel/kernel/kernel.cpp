@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <kernel/tty.h>
+#include <kernel/multiboot.h>
 
 /* Check if the compiler thinks you are targeting the wrong operating system. */
 #if defined(__linux__)
@@ -14,7 +15,7 @@
 #error "This tutorial needs to be compiled with a ix86-elf compiler"
 #endif
 
-extern "C" void kernel_main(void);
+extern "C" void kernel_main(const multiboot_info *multiboot_info_pointer, uint32_t multiboot_magic_value);
 
 struct Point
 {
@@ -64,11 +65,12 @@ struct Rectangle
 	}
 };
 
-void terminal_writehex(size_t h)
+template<int base = 10>
+void terminal_write_number(size_t h)
 {
-	if(const auto high = h / 16)
-		terminal_writehex(high);
-	const auto n = h % 16;
+	if(const auto high = h / base)
+		terminal_write_number<base>(high);
+	const auto n = h % base;
 	if(n > 9)
 		terminal_putchar('A' + n - 10);
 	else
@@ -135,7 +137,7 @@ enum vga_color {
 	VGA_COLOR_WHITE = 15,
 };
 
-void kernel_main(void)
+void kernel_main(const multiboot_info *multiboot_info_pointer, uint32_t multiboot_magic_value)
 {
 	/* Initialize terminal interface */
 	terminal_initialize();
@@ -146,6 +148,73 @@ void kernel_main(void)
 	init_pit();
 	init_serial();
 
+	if(multiboot_magic_value != 0x2BADB002)
+	{
+		DEBUG_MESSAGE("!!!Bad multiboot magic value!!!");
+		return;
+	}
+	if(multiboot_info_pointer->flags & 0x200)
+	{
+		DEBUG_MESSAGE("bootloader name: ");
+		write_serial(multiboot_info_pointer->boot_loader_name);write_serial("\n");
+	}
+	if(multiboot_info_pointer->flags & 0x800)
+	{
+		DEBUG_MESSAGE("VBE info: ");
+		write_serial<16>(multiboot_info_pointer->vbe_mode);write_serial("\n");
+	}
+	if(multiboot_info_pointer->flags & 0x1000)
+	{
+		DEBUG_MESSAGE("Frame Buffer info: ");
+		write_serial(multiboot_info_pointer->framebuffer_width); write_serial("x");
+		write_serial(multiboot_info_pointer->framebuffer_height); write_serial(" ");
+		write_serial(multiboot_info_pointer->framebuffer_pitch); write_serial(" ");
+		write_serial(multiboot_info_pointer->framebuffer_bpp); write_serial("\n");
+		switch(multiboot_info_pointer->framebuffer_type)
+		{
+		case 0:
+			DEBUG_MESSAGE("Indexed colors");
+			break;
+		case 1:
+			DEBUG_MESSAGE("RGB colors");
+			break;
+		case 2:
+			DEBUG_MESSAGE("EGA text mode");
+			break;
+		default:
+			DEBUG_MESSAGE("unknown framebuffer type: ");
+    		write_serial(multiboot_info_pointer->framebuffer_type);write_serial("\n");
+		}
+
+
+		auto* pixel = reinterpret_cast<uint8_t*>(multiboot_info_pointer->framebuffer_addr);
+		for(int i = 0; i < 10; i++)
+		{
+			pixel+=multiboot_info_pointer->framebuffer_pitch;
+			*reinterpret_cast<uint32_t*>(pixel) = 0xFFFFFFFF;
+		}
+		for(int i = 0; i < 20; i++)
+		{
+			pixel+=multiboot_info_pointer->framebuffer_bpp/8;
+			*reinterpret_cast<uint32_t*>(pixel) = 0xFF000000;
+		}
+		for(int i = 0; i < 20; i++)
+		{
+			pixel+=multiboot_info_pointer->framebuffer_bpp/8;
+			*reinterpret_cast<uint32_t*>(pixel) = 0x00FF0000;
+		}
+		for(int i = 0; i < 20; i++)
+		{
+			pixel+=multiboot_info_pointer->framebuffer_bpp/8;
+			*reinterpret_cast<uint32_t*>(pixel) = 0x0000FF00;
+		}
+		for(int i = 0; i < 20; i++)
+		{
+			pixel+=multiboot_info_pointer->framebuffer_bpp/8;
+			*reinterpret_cast<uint32_t*>(pixel) = 0x000000FF;
+		}
+	}
+
 	enable_interrupts();
 	disable_cursor();
 
@@ -153,7 +222,6 @@ void kernel_main(void)
 
 	puts("Hello from puts\n   and it works!\n");
 
-	/* Newline support is left as an exercise. */
 	terminal_writestring("Hello, kernel World!\n");
 	terminal_setcolor(VGA_COLOR_BLUE | VGA_COLOR_WHITE << 4);
 	terminal_writestring("how are you doing ?\n I'm doing fine\n");
@@ -162,18 +230,18 @@ void kernel_main(void)
 	for(size_t i = n * VGA_HEIGHT; i < (n + 1) * VGA_HEIGHT; i++)
 	{
 		terminal_writestring("0x");
-		terminal_writehex(i);
+		terminal_write_number(i);
 		terminal_putchar(':');
 		terminal_putchar(i);
 		terminal_putchar('\n');
 	}*/
-	//terminal_writestring("0x");terminal_writehex(0);
-	terminal_writestring("0x");terminal_writehex(0);
-	terminal_writestring(" 0x");terminal_writehex(1);
-	terminal_writestring(" 0x");terminal_writehex(255);
-	terminal_writestring(" 0x");terminal_writehex(256);
-	terminal_writestring(" 0x");terminal_writehex(65535);
-	terminal_writestring(" 0x");terminal_writehex(65536);
+	//terminal_writestring("0x");terminal_write_number(0);
+	terminal_writestring("0x");terminal_write_number<16>(0);
+	terminal_writestring(" 0x");terminal_write_number<16>(1);
+	terminal_writestring(" 0x");terminal_write_number<16>(255);
+	terminal_writestring(" 0x");terminal_write_number<16>(256);
+	terminal_writestring(" 0x");terminal_write_number<16>(65535);
+	terminal_writestring(" 0x");terminal_write_number<16>(65536);
 	terminal_writestring("\n");
 	terminal_rect(Rectangle{Point{9, 9}, Size{12,10}}, Outline::Single);
 	terminal_rect(Rectangle{Point{10, 10}, Size{5,8}}, Outline::Double);

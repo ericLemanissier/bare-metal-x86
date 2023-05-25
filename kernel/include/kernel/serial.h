@@ -19,10 +19,11 @@ inline void write_serial(const char*s)
         write_serial_char(*s++);
 };
 
-inline void write_serial(uint32_t i, uint32_t b = 10)
+template<int b = 10>
+inline void write_serial(uint32_t i)
 {
 	if(const auto high = i / b)
-		write_serial(high, b);
+		write_serial<b>(high);
 	const auto n = i % b;
 	if(n > 9)
 		write_serial_char('A' + n - 10);
