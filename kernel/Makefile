@@ -1,5 +1,5 @@
 DEFAULT_HOST!=../default-host.sh
-HOST?=DEFAULT_HOST
+HOST?=$(DEFAULT_HOST)
 HOSTARCH!=../target-triplet-to-arch.sh $(HOST)
 
 CFLAGS?=-O2 -g
@@ -15,21 +15,21 @@ BOOTDIR?=$(EXEC_PREFIX)/boot
 INCLUDEDIR?=$(PREFIX)/include
 
 
-CFLAGS:=$(CFLAGS) -ffreestanding -Wall -Wextra -Wimplicit
-CPPFLAGS:=$(CPPFLAGS) -D__is_kernel -Iinclude
-CXXFLAGS:=$(CXXFLAGS) -ffreestanding -Wall -Wextra -fno-exceptions -fno-rtti -std=c++20
-LDFLAGS:=$(LDFLAGS) -ffreestanding -O2
-LIBS:=$(LIBS) -nostdlib -lgcc
+CFLAGS+= -ffreestanding -Wall -Wextra -Wimplicit
+CPPFLAGS+= -D__is_kernel -Iinclude
+CXXFLAGS+= -ffreestanding -Wall -Wextra -fno-exceptions -fno-rtti -std=c++20
+LDFLAGS+= -ffreestanding -O2
+LIBS+= -nostdlib -lgcc
 
 ARCHDIR=arch/$(HOSTARCH)
 
 include $(ARCHDIR)/make.config
 
-CFLAGS:=$(CFLAGS) $(KERNEL_ARCH_CFLAGS)
-CPPFLAGS:=$(CPPFLAGS) $(KERNEL_ARCH_CPPFLAGS)
-CXXFLAGS:=$(CXXFLAGS) $(KERNEL_ARCH_CFLAGS)
-LDFLAGS:=$(LDFLAGS) $(KERNEL_ARCH_LDFLAGS)
-LIBS:=$(LIBS) $(KERNEL_ARCH_LIBS)
+CFLAGS+= $(KERNEL_ARCH_CFLAGS)
+CPPFLAGS+= $(KERNEL_ARCH_CPPFLAGS)
+CXXFLAGS+= $(KERNEL_ARCH_CFLAGS)
+LDFLAGS+= $(KERNEL_ARCH_LDFLAGS)
+LIBS+= $(KERNEL_ARCH_LIBS)
 
 KERNEL_OBJS=\
 $(KERNEL_ARCH_OBJS) \

@@ -1,14 +1,71 @@
 {
     "version": "2.0.0",
-    "tasks": [{
-        "label": "Launch QEMU",
-        "type": "shell",
-        "isBackground": true,
-        "windows": {
-            "command": "qemu-system-i386 -S -gdb tcp::1234 -boot d -cdrom bin/myos.iso -m 512"
+    "tasks": [
+        {
+            "label": "compile",
+            "type": "shell",
+            "command": "make myos.iso",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
         },
-        "linux": {
-            "command": "qemu-system-i386 -S -gdb tcp::1234 -cdrom myos.iso -serial stdio"
+        {
+            "label": "clean",
+            "type": "shell",
+            "command": "make clean",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "toolchain",
+            "type": "shell",
+            "command": "make",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "options": {
+              "cwd": "${workspaceFolder}/toolchain"
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "run",
+            "type": "shell",
+            "command": "make qemu",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "Launch QEMU",
+            "type": "shell",
+            "isBackground": true,
+            "windows": {
+                "command": "qemu-system-i386 -S -gdb tcp::1234 -boot d -cdrom bin/myos.iso -m 512"
+            },
+            "linux": {
+                "command": "qemu-system-i386 -S -gdb tcp::1234 -cdrom myos.iso -serial stdio"
+            }
         }
-    }]
+    ]
 }
