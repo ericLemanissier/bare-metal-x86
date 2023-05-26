@@ -29,5 +29,7 @@ jobs:
       
     - uses: actions/upload-artifact@v3
       with:
-        name: myos.iso
-        path: pyos.iso
+        name: myos
+        path: |
+          myos.iso
+          kernel/myos.kernel
