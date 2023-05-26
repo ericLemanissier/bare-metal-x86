@@ -1,6 +1,4 @@
-DEFAULT_HOST!=../default-host.sh
-HOST?=$(DEFAULT_HOST)
-HOSTARCH!=../target-triplet-to-arch.sh $(HOST)
+HOSTARCH=i386
 
 CFLAGS?=-O2 -g
 CPPFLAGS?=
@@ -66,9 +64,9 @@ $(ARCHDIR)/crtbegin.o $(ARCHDIR)/crtend.o:
 
 
 clean:
-	rm -f myos.kernel
-	rm -f $(OBJS) *.o */*.o */*/*.o
-	rm -f $(OBJS:.o=.d) *.d */*.d */*/*.d
+	$(RM) myos.kernel
+	$(RM) $(OBJS) *.o */*.o */*/*.o
+	$(RM) $(OBJS:.o=.d) *.d */*.d */*/*.d
 
 install: install-headers install-kernel
 

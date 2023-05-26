@@ -5,6 +5,8 @@ export PREFIX:=${PWD}/../opt/cross
 export TARGET:=i686-elf
 export PATH:=$(PREFIX)/bin:$(PATH)
 
+.PHONY: all binutils gcc clean
+
 all:
 	$(MAKE) binutils
 	$(MAKE) gcc
@@ -36,3 +38,12 @@ gcc:
 	$(MAKE) install-target-libgcc && \
 	$(MAKE) all-target-libstdc++-v3 && \
 	$(MAKE) install-target-libstdc++-v3
+
+clean:
+	$(RM) binutils-$(BINUTILS_VERSION).tar.xz
+	$(RM) -r binutils-$(BINUTILS_VERSION)
+	$(RM) -r build-binutils
+
+	$(RM) gcc-$(GCC_VERSION).tar.xz
+	$(RM) -r gcc-$(GCC_VERSION)
+	$(RM) -r build-gcc

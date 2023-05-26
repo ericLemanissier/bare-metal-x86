@@ -1,25 +1,25 @@
 SYSTEM_HEADER_PROJECTS="kernel"
 PROJECTS="kernel"
 
-DEFAULT_HOST!=./default-host.sh
-HOST?=$(DEFAULT_HOST)
+export HOST=i686-elf
 
-AR=${HOST}-ar
-AS=${HOST}-as
-CC=${HOST}-gcc
-CXX=${HOST}-g++
+export AR=${HOST}-ar
+export AS=${HOST}-as
+export CC=${HOST}-gcc
+export CXX=${HOST}-g++
 
-PREFIX=/usr
-EXEC_PREFIX=$(PREFIX)
-BOOTDIR=/boot
-LIBDIR=$(EXEC_PREFIX)/lib
-INCLUDEDIR=$(PREFIX)/include
+export PREFIX=/usr
+export EXEC_PREFIX=$(PREFIX)
+export BOOTDIR=/boot
+export LIBDIR=$(EXEC_PREFIX)/lib
+export INCLUDEDIR=$(PREFIX)/include
 
-CFLAGS=-O2 -g
-CPPFLAGS=
+export CFLAGS=-O2 -g
+export CPPFLAGS=
+export CXXFLAGS=-O2 -g
 
 # Configure the cross-compiler to use the desired system root.
-SYSROOT=$(shell pwd)/sysroot
+export SYSROOT=$(shell pwd)/sysroot
 CC+= --sysroot=$(SYSROOT)
 CXX+= --sysroot=$(SYSROOT)
 
@@ -27,24 +27,6 @@ CXX+= --sysroot=$(SYSROOT)
 # because it was configured with --without-headers rather than --with-sysroot.
 CC+= -isystem=$(INCLUDEDIR)
 CXX+= -isystem=$(INCLUDEDIR)
-
-export DEFAULT_HOST
-export HOST
-export AR
-export AS
-export CC
-export CXX
-
-export PREFIX
-export EXEC_PREFIX
-export BOOTDIR
-export LIBDIR
-export INCLUDEDIR
-
-export CFLAGS
-export CPPFLAGS
-
-export SYSROOT
 
 .PHONY: clean headers build qemu toolchain
 
@@ -54,10 +36,10 @@ clean:
 	for PROJECT in $(PROJECTS); do \
 	(cd $$PROJECT && $(MAKE) clean) \
 	done
-
-	rm -rf sysroot
-	rm -rf isodir
-	rm -rf myos.iso
+	$(RM) -r sysroot
+	$(RM) -r isodir
+	$(RM) myos.iso
+	cd toolchain && $(MAKE) clean
 
 headers:
 	mkdir -p "$(SYSROOT)"
@@ -83,4 +65,4 @@ myos.iso: sysroot/boot/myos.kernel grub.cfg
 	grub-mkrescue -o myos.iso isodir
 
 qemu: myos.iso
-	qemu-system-$(shell ./target-triplet-to-arch.sh $(HOST)) -cdrom myos.iso -serial stdio
+	qemu-system-i386 -cdrom myos.iso -serial stdio
