@@ -1,12 +1,7 @@
 #ifndef _KERNEL_LL_H
 #define _KERNEL_LL_H
 
-#include <stdint.h>
-#include <stdbool.h>
-
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include <cstdint>
 
 uint32_t farpeekl(uint16_t sel, void* off);
 void farpokeb(uint16_t sel, void* off, uint8_t v);
@@ -25,9 +20,5 @@ unsigned long read_cr0(void);
 void invlpg(void* m);
 void wrmsr(uint32_t msr_id, uint64_t msr_value);
 uint64_t rdmsr(uint32_t msr_id);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif

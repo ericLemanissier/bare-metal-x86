@@ -1,5 +1,5 @@
 #include "kernel/gdt.h"
-#include <stdint.h>
+#include <cstdint>
 
 #include "kernel/ll.h"
 

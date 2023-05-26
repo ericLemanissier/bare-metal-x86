@@ -1,7 +1,7 @@
 #ifndef _KERNEL_SERIAL_H
 #define _KERNEL_SERIAL_H
 
-#include <stdint.h>
+#include <cstdint>
 
 int init_serial();
 

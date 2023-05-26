@@ -1,5 +1,5 @@
 #include "kernel/idt.h"
-#include <stdint.h>
+#include <cstdint>
 
 namespace {
 

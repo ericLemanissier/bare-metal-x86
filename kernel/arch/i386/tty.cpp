@@ -1,13 +1,15 @@
-#include <kernel/tty.h>
-#include "vga.h"
+#include "kernel/tty.h"
+#include "kernel/vga.h"
 
-static constexpr size_t VGA_WIDTH = 80;
-static constexpr size_t VGA_HEIGHT = 25;
+namespace {
+constexpr size_t VGA_WIDTH = 80;
+constexpr size_t VGA_HEIGHT = 25;
 
 size_t terminal_row = 0;
 size_t terminal_column = 0;
-static uint8_t terminal_color = vga_entry_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);;
+uint8_t terminal_color = vga_entry_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);;
 uint16_t* terminal_buffer = (uint16_t*) 0xB8000;
+}
 
 void terminal_initialize(void)
 {

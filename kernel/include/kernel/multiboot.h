@@ -1,7 +1,7 @@
 #ifndef _KERNEL_MULTIBOOT_H
 #define _KERNEL_MULTIBOOT_H
 
-#include <stdint.h>
+#include <cstdint>
 
 struct aout_symbol_table
 {
