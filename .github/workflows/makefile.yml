@@ -21,6 +21,9 @@ jobs:
       run: make -j2
       working-directory: toolchain
 
+    - name: install os dependencies
+      run: sudo apt-get install -y mtools
+
     - name: make ISO
       run: ./iso.sh
       
