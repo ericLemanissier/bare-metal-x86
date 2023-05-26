@@ -1,7 +1,13 @@
-#include "kernel/idt.h"
+module;
 #include <cstdint>
 
-namespace {
+export module idt;
+import ll;
+import debug;
+import serial;
+import ticks;
+
+
 
 /* Descripteur de segment */
 struct idtdesc {
@@ -28,11 +34,6 @@ void init_idt_desc(uint16_t select, uint32_t offset, uint16_t type, struct idtde
     return;
 }
 
-}
-
-#include "kernel/ll.h"
-#include "kernel/debug.h"
-
 extern "C" void _asm_schedule();
 extern "C" void _asm_timer();
 extern "C" void _asm_int_kbd();
@@ -40,7 +41,7 @@ extern "C" void _asm_syscalls();
 extern "C" void _asm_exc_GP(void);
 extern "C" void _asm_exc_PF(void);
 
-void init_idt(void)
+export void init_idt(void)
 {
     /* Init irq */
     for (auto &e : kidt)
@@ -69,16 +70,9 @@ extern "C" void isr_schedule_int()
 	outb(0xA0,0x20);
 }
 
-#include "kernel/serial.h"
-
-static uint64_t ticks{};
-uint64_t get_tick()
-{
-    return ticks;
-}
 extern "C" void isr_timer_int()
 {
-    ticks++;
+    inc_ticks();
 	outb(0x20,0x20);
 	outb(0xA0,0x20);
 }

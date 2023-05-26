@@ -1,10 +1,11 @@
-#ifndef ARCH_I386_VGA_H
-#define ARCH_I386_VGA_H
+module;
 
 #include <cstdint>
 
+export module vga;
+
 /* Hardware text mode color constants. */
-enum vga_color {
+export enum vga_color {
 	VGA_COLOR_BLACK = 0,
 	VGA_COLOR_BLUE = 1,
 	VGA_COLOR_GREEN = 2,
@@ -23,14 +24,12 @@ enum vga_color {
 	VGA_COLOR_WHITE = 15,
 };
 
-constexpr uint8_t vga_entry_color(enum vga_color fg, enum vga_color bg)
+export constexpr uint8_t vga_entry_color(enum vga_color fg, enum vga_color bg)
 {
 	return fg | bg << 4;
 }
 
-constexpr uint16_t vga_entry(unsigned char uc, uint8_t color)
+export constexpr uint16_t vga_entry(unsigned char uc, uint8_t color)
 {
 	return (uint16_t) uc | (uint16_t) color << 8;
 }
-
-#endif

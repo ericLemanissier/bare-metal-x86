@@ -10,12 +10,11 @@ DESTDIR?=
 PREFIX?=/usr/local
 EXEC_PREFIX?=$(PREFIX)
 BOOTDIR?=$(EXEC_PREFIX)/boot
-INCLUDEDIR?=$(PREFIX)/include
 
 
 CFLAGS+= -ffreestanding -Wall -Wextra -Wimplicit
-CPPFLAGS+= -D__is_kernel -Iinclude
-CXXFLAGS+= -ffreestanding -Wall -Wextra -fno-exceptions -fno-rtti -std=c++20
+CPPFLAGS+= -D__is_kernel
+CXXFLAGS+= -ffreestanding -Wall -Wextra -fno-exceptions -fno-rtti -std=c++20  -fmodules-ts
 LDFLAGS+= -ffreestanding -O2
 LIBS+= -nostdlib -lgcc
 
@@ -30,9 +29,10 @@ LDFLAGS+= $(KERNEL_ARCH_LDFLAGS)
 LIBS+= $(KERNEL_ARCH_LIBS)
 
 KERNEL_OBJS=\
-$(KERNEL_ARCH_OBJS) \
-kernel/kernel.o \
 kernel/debug.o \
+$(KERNEL_ARCH_OBJS) \
+kernel/debug_impl.o \
+kernel/kernel.o \
 
 OBJS=\
 $(ARCHDIR)/crti.o \
@@ -50,31 +50,26 @@ $(LIBS) \
 $(ARCHDIR)/crtend.o \
 $(ARCHDIR)/crtn.o \
 
-.PHONY: all clean install install-headers install-kernel
+.PHONY: all clean install
 .SUFFIXES: .o .c .S
 
 all: myos.kernel
 
 myos.kernel: $(OBJS) $(ARCHDIR)/linker.ld
-	$(CC) -T $(ARCHDIR)/linker.ld -o $@ $(CFLAGS) $(LINK_LIST)
+	$(CXX) -T $(ARCHDIR)/linker.ld -o $@ $(CFLAGS) $(LINK_LIST)
 	grub-file --is-x86-multiboot myos.kernel
 
 $(ARCHDIR)/crtbegin.o $(ARCHDIR)/crtend.o:
-	OBJ=`$(CC) $(CFLAGS) $(LDFLAGS) -print-file-name=$(@F)` && cp "$$OBJ" $@
+	OBJ=`$(CXX) $(CFLAGS) $(LDFLAGS) -print-file-name=$(@F)` && cp "$$OBJ" $@
 
 
 clean:
 	$(RM) myos.kernel
 	$(RM) $(OBJS) *.o */*.o */*/*.o
 	$(RM) $(OBJS:.o=.d) *.d */*.d */*/*.d
+	$(RM) -r gcm.cache
 
-install: install-headers install-kernel
-
-install-headers:
-	mkdir -p $(DESTDIR)$(INCLUDEDIR)
-	cp -R --preserve=timestamps include/. $(DESTDIR)$(INCLUDEDIR)/.
-
-install-kernel: myos.kernel
+install: myos.kernel
 	mkdir -p $(DESTDIR)$(BOOTDIR)
 	cp myos.kernel $(DESTDIR)$(BOOTDIR)
 

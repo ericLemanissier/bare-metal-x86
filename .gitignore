@@ -5,3 +5,4 @@ toolchain/gcc-*
 sysroot
 myos.iso
 isodir/*
+*.gcm

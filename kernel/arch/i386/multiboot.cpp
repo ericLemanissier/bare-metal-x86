@@ -1,9 +1,10 @@
-#ifndef _KERNEL_MULTIBOOT_H
-#define _KERNEL_MULTIBOOT_H
+module;
 
 #include <cstdint>
 
-struct aout_symbol_table
+export module multiboot;
+
+export struct aout_symbol_table
 {
   uint32_t tabsize;
   uint32_t strsize;
@@ -13,7 +14,7 @@ struct aout_symbol_table
 
 
 /* The section header table for ELF. */
-struct elf_section_header_table
+export struct elf_section_header_table
 {
   uint32_t num;
   uint32_t size;
@@ -21,7 +22,7 @@ struct elf_section_header_table
   uint32_t shndx;
 };
 
-struct vbe_info_block{
+export struct vbe_info_block{
    char VbeSignature[4];             // == "VESA"
    uint16_t VbeVersion;                 // == 0x0300 for VBE 3.0
    uint16_t OemStringPtr[2];            // isa vbeFarPtr
@@ -30,7 +31,7 @@ struct vbe_info_block{
    uint16_t TotalMemory;             // as # of 64KB blocks
 } __attribute__((packed));
 
-struct vbe_mode_info_structure {
+export struct vbe_mode_info_structure {
 	uint16_t attributes;		// deprecated, only bit 7 should be of interest to you, and it indicates the mode supports a linear frame buffer.
 	uint8_t window_a;			// deprecated
 	uint8_t window_b;			// deprecated
@@ -68,7 +69,7 @@ struct vbe_mode_info_structure {
 	uint8_t reserved1[206];
 } __attribute__ ((packed));
 
-struct multiboot_info
+export struct multiboot_info
 {
   uint32_t flags;
   uint32_t mem_lower;
@@ -103,5 +104,3 @@ struct multiboot_info
   uint8_t framebuffer_type;
   uint32_t color_info;
 };
-
-#endif

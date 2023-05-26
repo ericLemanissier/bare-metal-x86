@@ -1,7 +1,8 @@
-#include "kernel/pic.h"
-#include "kernel/ll.h"
+export module pic;
 
-void init_pic(void)
+import ll;
+
+export void init_pic(void)
 {
     /* Initialization of ICW1 */
     outb(0x20, 0x11);

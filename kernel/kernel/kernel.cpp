@@ -1,7 +1,9 @@
 #include <cstddef>
 #include <cstdint>
-#include "kernel/tty.h"
-#include "kernel/multiboot.h"
+
+import tty;
+import vga;
+import multiboot;
 
 /* Check if the compiler thinks you are targeting the wrong operating system. */
 #if defined(__linux__)
@@ -95,13 +97,13 @@ void terminal_rect(const Rectangle &rect, Outline o = Outline::Single)
 
 }
 
-#include "kernel/ll.h"
-#include "kernel/serial.h"
-#include "kernel/debug.h"
-#include "kernel/idt.h"
-#include "kernel/gdt.h"
-#include "kernel/pic.h"
-#include "kernel/pit.h"
+import ll;
+import serial;
+import debug;
+import idt;
+import gdt;
+import pic;
+import pit;
 
 
 void kernel_main(const multiboot_info *multiboot_info_pointer, uint32_t multiboot_magic_value)

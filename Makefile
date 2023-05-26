@@ -12,7 +12,6 @@ export PREFIX=/usr
 export EXEC_PREFIX=$(PREFIX)
 export BOOTDIR=/boot
 export LIBDIR=$(EXEC_PREFIX)/lib
-export INCLUDEDIR=$(PREFIX)/include
 
 export CFLAGS=-O2 -g
 export CPPFLAGS=
@@ -28,7 +27,7 @@ CXX+= --sysroot=$(SYSROOT)
 CC+= -isystem=$(INCLUDEDIR)
 CXX+= -isystem=$(INCLUDEDIR)
 
-.PHONY: clean headers build qemu toolchain
+.PHONY: clean build qemu toolchain
 
 .DEFAULT_GOAL := myos.iso
 
@@ -41,13 +40,7 @@ clean:
 	$(RM) myos.iso
 	cd toolchain && $(MAKE) clean
 
-headers:
-	mkdir -p "$(SYSROOT)"
-	for PROJECT in $(SYSTEM_HEADER_PROJECTS); do \
-	(cd $$PROJECT && DESTDIR="$(SYSROOT)" $(MAKE) install-headers) \
-	done
-
-build: headers
+build:
 	export PATH="$(shell pwd)/opt/cross/bin:${PATH}" && \
 	for PROJECT in $(PROJECTS); do \
 	(cd $$PROJECT && DESTDIR="$(SYSROOT)" $(MAKE) install) \

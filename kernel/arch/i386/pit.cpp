@@ -1,13 +1,16 @@
-#include "kernel/pit.h"
+module;
+#include <cstdint>
 
-#include "kernel/ll.h"
+export module pit;
+
+import ll;
 
 #define PIT_CHANNEL0_DATA_PORT 0x40
 #define PIT_COMMAND_PORT 0x43
 #define PIT_FREQUENCY 1193182    // PIT input frequency in Hz
 
 // Function to initialize the PIT
-void init_pit(void)
+export void init_pit(void)
 {
     // Set the PIT to generate periodic interrupts
     uint16_t divisor = PIT_FREQUENCY / 1000;    // Convert to milliseconds (adjust as needed)

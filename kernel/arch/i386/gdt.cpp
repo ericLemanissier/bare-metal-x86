@@ -1,9 +1,10 @@
-#include "kernel/gdt.h"
+module;
 #include <cstdint>
 
-#include "kernel/ll.h"
+export module gdt;
 
-namespace {
+import ll;
+
 
 #define GDTSIZE		0xFF	/* nombre max. de descripteurs dans la table */
 
@@ -36,12 +37,10 @@ void init_gdt_desc(uint32_t base, uint32_t limite, uint8_t acces, uint8_t other,
 	return;
 }
 
-}
-
 /*
  * This function initialize the GDT after the kernel is loaded.
  */
-void init_gdt(void)
+export void init_gdt(void)
 {
 
 	/* initialize gdt segments */
