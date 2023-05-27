@@ -22,11 +22,6 @@ export SYSROOT=$(shell pwd)/sysroot
 CC+= --sysroot=$(SYSROOT)
 CXX+= --sysroot=$(SYSROOT)
 
-# Work around that the -elf gcc targets doesn't have a system include directory
-# because it was configured with --without-headers rather than --with-sysroot.
-CC+= -isystem=$(INCLUDEDIR)
-CXX+= -isystem=$(INCLUDEDIR)
-
 .PHONY: clean build qemu toolchain
 
 .DEFAULT_GOAL := myos.iso
