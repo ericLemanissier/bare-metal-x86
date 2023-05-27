@@ -12,10 +12,10 @@ EXEC_PREFIX?=$(PREFIX)
 BOOTDIR?=$(EXEC_PREFIX)/boot
 
 
-CFLAGS+= -ffreestanding -Wall -Wextra -Wimplicit
+CFLAGS+= -ffreestanding -Wall -Wextra -Wimplicit -flto
 CPPFLAGS+= -D__is_kernel
-CXXFLAGS+= -ffreestanding -Wall -Wextra -fno-exceptions -fno-rtti -std=c++20  -fmodules-ts
-LDFLAGS+= -ffreestanding -O2
+CXXFLAGS+= -ffreestanding -Wall -Wextra -fno-exceptions -fno-rtti -std=c++20  -fmodules-ts -flto
+LDFLAGS+= -ffreestanding -O2 -flto
 LIBS+= -nostdlib -lgcc
 
 ARCHDIR=arch/$(HOSTARCH)
