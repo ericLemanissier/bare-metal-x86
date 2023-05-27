@@ -25,7 +25,7 @@ jobs:
       run: sudo apt-get install -y mtools
 
     - name: make ISO
-      run: make -j2
+      run: make
 
     - uses: actions/upload-artifact@v3
       with:
