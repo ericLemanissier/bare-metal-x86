@@ -1,8 +1,6 @@
-module;
-
-#include <cstdint>
-
 export module ticks;
+
+import <cstdint>;
 
 uint64_t ticks{};
 

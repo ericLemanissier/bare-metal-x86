@@ -1,9 +1,7 @@
-module;
-
-
-#include <cstdint>
-
 export module ll;
+
+import <cstdint>;
+
 export {
 uint32_t farpeekl(uint16_t sel, void* off);
 void farpokeb(uint16_t sel, void* off, uint8_t v);

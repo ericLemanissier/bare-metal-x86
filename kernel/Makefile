@@ -37,6 +37,9 @@ kernel/kernel.o \
 OBJS=\
 $(ARCHDIR)/crti.o \
 $(ARCHDIR)/crtbegin.o \
+$(ARCHDIR)/cstddef.o \
+$(ARCHDIR)/cstdint.o \
+$(ARCHDIR)/source_location.o \
 $(KERNEL_OBJS) \
 $(ARCHDIR)/crtend.o \
 $(ARCHDIR)/crtn.o \
@@ -61,6 +64,15 @@ myos.kernel: $(OBJS) $(ARCHDIR)/linker.ld
 
 $(ARCHDIR)/crtbegin.o $(ARCHDIR)/crtend.o:
 	OBJ=`$(CXX) $(CFLAGS) $(LDFLAGS) -print-file-name=$(@F)` && cp "$$OBJ" $@
+
+$(ARCHDIR)/cstddef.o:
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -xc++-system-header cstddef
+
+$(ARCHDIR)/cstdint.o:
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -xc++-system-header cstdint
+
+$(ARCHDIR)/source_location.o:
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -xc++-system-header source_location
 
 
 clean:

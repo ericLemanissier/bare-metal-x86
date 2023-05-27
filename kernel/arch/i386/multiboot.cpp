@@ -1,8 +1,6 @@
-module;
-
-#include <cstdint>
-
 export module multiboot;
+
+import <cstdint>;
 
 export struct aout_symbol_table
 {

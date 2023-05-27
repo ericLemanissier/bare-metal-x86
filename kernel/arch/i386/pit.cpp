@@ -1,13 +1,12 @@
-module;
-#include <cstdint>
-
 export module pit;
+
+import <cstdint>;
 
 import ll;
 
-#define PIT_CHANNEL0_DATA_PORT 0x40
-#define PIT_COMMAND_PORT 0x43
-#define PIT_FREQUENCY 1193182    // PIT input frequency in Hz
+constexpr auto PIT_CHANNEL0_DATA_PORT = 0x40;
+constexpr auto PIT_COMMAND_PORT = 0x43;
+constexpr auto PIT_FREQUENCY = 1193182;    // PIT input frequency in Hz
 
 // Function to initialize the PIT
 export void init_pit(void)

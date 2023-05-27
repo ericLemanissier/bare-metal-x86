@@ -1,8 +1,6 @@
-module;
-
-#include <cstdint>
-
 export module vga;
+
+import <cstdint>;
 
 /* Hardware text mode color constants. */
 export enum vga_color {

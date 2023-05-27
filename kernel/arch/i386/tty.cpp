@@ -1,9 +1,7 @@
-module;
-
-#include <cstddef>
-#include <cstdint>
-
 export module tty;
+
+import <cstddef>;
+import <cstdint>;
 
 import vga;
 

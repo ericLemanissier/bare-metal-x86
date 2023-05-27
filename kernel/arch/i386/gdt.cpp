@@ -1,12 +1,10 @@
-module;
-#include <cstdint>
-
 export module gdt;
 
+import <cstdint>;
 import ll;
 
 
-#define GDTSIZE		0xFF	/* nombre max. de descripteurs dans la table */
+constexpr auto GDTSIZE = 0xFF;	/* nombre max. de descripteurs dans la table */
 
 /* Descripteur de segment */
 struct gdtdesc {

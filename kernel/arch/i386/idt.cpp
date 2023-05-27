@@ -1,7 +1,6 @@
-module;
-#include <cstdint>
-
 export module idt;
+
+import <cstdint>;
 import ll;
 import debug;
 import serial;
@@ -17,10 +16,10 @@ struct idtdesc {
 	uint16_t offset16_31{};
 } __attribute__ ((packed));
 
-#define IDTSIZE		0xFF	/* nombre max. de descripteurs dans la table */
+constexpr auto IDTSIZE = 0xFF;	/* nombre max. de descripteurs dans la table */
 
-#define INTGATE  0x8E00		/* utilise pour gerer les interruptions */
-#define TRAPGATE 0xEF00		/* utilise pour faire des appels systemes */
+constexpr auto INTGATE = 0x8E00;		/* utilise pour gerer les interruptions */
+constexpr auto TRAPGATE = 0xEF00;		/* utilise pour faire des appels systemes */
 
 
 idtdesc 	kidt[IDTSIZE]; 		/* IDT table */

@@ -1,7 +1,6 @@
-module;
-#include <cstdint>
-
 export module serial;
+
+import <cstdint>;
 
 import ll;
 
@@ -35,7 +34,7 @@ inline void write_serial(const auto i)
 };
 }
 
-#define PORT 0x3f8          // COM1
+constexpr auto PORT = 0x3f8;          // COM1
 
 int init_serial() {
    outb(PORT + 1, 0x00);    // Disable all interrupts

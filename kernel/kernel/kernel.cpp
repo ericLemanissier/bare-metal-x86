@@ -1,5 +1,5 @@
-#include <cstddef>
-#include <cstdint>
+import <cstddef>;
+import <cstdint>;
 
 import tty;
 import vga;

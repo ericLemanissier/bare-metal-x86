@@ -1,8 +1,6 @@
-module;
-
-#include <source_location>
-
 module debug;
+
+import <source_location>;
 
 import ticks;
 import serial;
