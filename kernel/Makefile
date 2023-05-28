@@ -30,8 +30,10 @@ LIBS+= $(KERNEL_ARCH_LIBS)
 
 KERNEL_OBJS=\
 kernel/debug.o \
+kernel/geom.o \
 $(KERNEL_ARCH_OBJS) \
 kernel/debug_impl.o \
+kernel/pixel.o \
 kernel/kernel.o \
 
 OBJS=\

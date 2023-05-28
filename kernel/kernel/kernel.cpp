@@ -17,85 +17,7 @@ import multiboot;
 
 extern "C" void kernel_main(const multiboot_info *multiboot_info_pointer, uint32_t multiboot_magic_value);
 
-struct Point
-{
-	size_t x{};
-	size_t y{};
-};
-
-struct Size
-{
-	size_t w{};
-	size_t h{};
-};
-
-struct Rectangle
-{
-	Point m_top_left{};
-	Size size{};
-
-	constexpr Point top_left() const
-	{
-		return m_top_left;
-	}
-
-	constexpr Point top_right() const
-	{
-		return {m_top_left.x + width() - 1, m_top_left.y};
-	}
-
-	constexpr Point bottom_left() const
-	{
-		return {m_top_left.x, m_top_left.y + height() - 1};
-	}
-
-	constexpr Point bottom_right() const
-	{
-		return {m_top_left.x + width() - 1, m_top_left.y + height() - 1};
-	}
-
-	constexpr size_t width() const
-	{
-		return size.w;
-	}
-
-	constexpr size_t height() const
-	{
-		return size.h;
-	}
-};
-
-enum class Outline
-{
-	Single,
-	Double
-};
-
-void terminal_putentryat(char c, Point p)
-{
-	terminal_putentryat(c, p.x, p.y);
-}
-
-void terminal_rect(const Rectangle &rect, Outline o = Outline::Single)
-{
-	terminal_putentryat(o == Outline::Single ? 0xDA : 0xC9, rect.top_left());
-	terminal_putentryat(o == Outline::Single ? 0xC0 : 0xC8, rect.bottom_left());
-	terminal_putentryat(o == Outline::Single ? 0xBF : 0xBB, rect.top_right());
-	terminal_putentryat(o == Outline::Single ? 0xD9 : 0xBC, rect.bottom_right());
-
-	for(size_t y = 1; y + 1 < rect.height(); y++)
-	{
-		terminal_putentryat(o == Outline::Single ? 0xB3 : 0xBA, rect.top_left().x, rect.top_left().y + y);
-		terminal_putentryat(o == Outline::Single ? 0xB3 : 0xBA, rect.top_right().x, rect.top_right().y + y);
-	}
-
-	for(size_t x = 1; x + 1 < rect.width(); x++)
-	{
-		terminal_putentryat(o == Outline::Single ? 0xC4 : 0xCD, rect.top_left().x + x, rect.top_left().y);
-		terminal_putentryat(o == Outline::Single ? 0xC4 : 0xCD, rect.bottom_left().x + x, rect.bottom_left().y);
-	}
-
-}
+import geom;
 
 import ll;
 import serial;
@@ -104,12 +26,12 @@ import idt;
 import gdt;
 import pic;
 import pit;
+import pixel;
 
 
 void kernel_main(const multiboot_info *multiboot_info_pointer, uint32_t multiboot_magic_value)
 {
-	/* Initialize terminal interface */
-	terminal_initialize();
+	terminal_clear();
 
 	init_gdt();
 	init_idt();
@@ -127,57 +49,8 @@ void kernel_main(const multiboot_info *multiboot_info_pointer, uint32_t multiboo
 		debug("bootloader name: ");
 		write_serial(multiboot_info_pointer->boot_loader_name);write_serial("\n");
 	}
-	if(multiboot_info_pointer->flags & 0x800)
-	{
-		debug("VBE info: ");
-		write_serial<16>(multiboot_info_pointer->vbe_mode);write_serial("\n");
-	}
-	if(multiboot_info_pointer->flags & 0x1000)
-	{
-		debug("Frame Buffer info: ");
-		write_serial(multiboot_info_pointer->framebuffer_width); write_serial("x");
-		write_serial(multiboot_info_pointer->framebuffer_height); write_serial(" ");
-		write_serial(multiboot_info_pointer->framebuffer_pitch); write_serial(" ");
-		write_serial(multiboot_info_pointer->framebuffer_bpp); write_serial("\n");
-		switch(multiboot_info_pointer->framebuffer_type)
-		{
-		case 0:
-			debug("Indexed colors");
-			break;
-		case 1:
-			debug("RGB colors");
-			break;
-		case 2:
-			debug("EGA text mode");
-			break;
-		default:
-			debug("unknown framebuffer type: ");
-    		write_serial(multiboot_info_pointer->framebuffer_type);write_serial("\n");
-		}
 
-
-		auto* pixel = reinterpret_cast<uint8_t*>(multiboot_info_pointer->framebuffer_addr);
-		for(int i = 0; i < 10; i++)
-		{
-			pixel+=multiboot_info_pointer->framebuffer_pitch;
-			*reinterpret_cast<uint32_t*>(pixel) = 0xFFFFFF;
-		}
-		for(int i = 0; i < 20; i++)
-		{
-			pixel+=multiboot_info_pointer->framebuffer_bpp/8;
-			*reinterpret_cast<uint32_t*>(pixel) = 0xFF0000;
-		}
-		for(int i = 0; i < 20; i++)
-		{
-			pixel+=multiboot_info_pointer->framebuffer_bpp/8;
-			*reinterpret_cast<uint32_t*>(pixel) = 0x00FF00;
-		}
-		for(int i = 0; i < 20; i++)
-		{
-			pixel+=multiboot_info_pointer->framebuffer_bpp/8;
-			*reinterpret_cast<uint32_t*>(pixel) = 0x0000FF;
-		}
-	}
+	Pixel pixel(*multiboot_info_pointer);
 
 	enable_interrupts();
 	disable_cursor();
@@ -207,12 +80,15 @@ void kernel_main(const multiboot_info *multiboot_info_pointer, uint32_t multiboo
 	terminal_writestring(" 0x");terminal_write_number<16>(65535);
 	terminal_writestring(" 0x");terminal_write_number<16>(65536);
 	terminal_writestring("\n");
-	terminal_rect(Rectangle{Point{9, 9}, Size{12,10}}, Outline::Single);
-	terminal_rect(Rectangle{Point{10, 10}, Size{5,8}}, Outline::Double);
-	terminal_rect(Rectangle{Point{15, 10}, Size{5,3}}, Outline::Single);
+	terminal_rect(Rect{Point{9, 9}, Size{12,10}}, Outline::Single);
+	terminal_rect(Rect{Point{10, 10}, Size{5,8}}, Outline::Double);
+	terminal_rect(Rect{Point{15, 10}, Size{5,3}}, Outline::Single);
 
 	debug("Hello debug world!");
 
+	pixel.fill_rect(Rect{Point{90, 90}, Size{120,100}}, YELLOW);
+	pixel.fill_rect(Rect{Point{100, 100}, Size{50,80}}, CYAN);
+	pixel.fill_rect(Rect{Point{150, 100}, Size{50,30}}, MAGENTA);
 	while (1)
     {
     	asm volatile ( "hlt" );
