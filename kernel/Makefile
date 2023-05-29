@@ -36,12 +36,16 @@ kernel/debug_impl.o \
 kernel/pixel.o \
 kernel/kernel.o \
 
+STDLIB_OBJS=\
+cstddef.o \
+cstdint.o \
+source_location.o \
+
+
 OBJS=\
 $(ARCHDIR)/crti.o \
 $(ARCHDIR)/crtbegin.o \
-$(ARCHDIR)/cstddef.o \
-$(ARCHDIR)/cstdint.o \
-$(ARCHDIR)/source_location.o \
+$(STDLIB_OBJS) \
 $(KERNEL_OBJS) \
 $(ARCHDIR)/crtend.o \
 $(ARCHDIR)/crtn.o \
@@ -62,19 +66,13 @@ all: myos.kernel
 
 myos.kernel: $(OBJS) $(ARCHDIR)/linker.ld
 	$(CXX) -T $(ARCHDIR)/linker.ld -o $@ $(CFLAGS) $(LINK_LIST)
-	grub-file --is-x86-multiboot myos.kernel
+	grub-file --is-x86-multiboot $@
 
 $(ARCHDIR)/crtbegin.o $(ARCHDIR)/crtend.o:
 	OBJ=`$(CXX) $(CFLAGS) $(LDFLAGS) -print-file-name=$(@F)` && cp "$$OBJ" $@
 
-$(ARCHDIR)/cstddef.o:
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -xc++-system-header cstddef
-
-$(ARCHDIR)/cstdint.o:
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -xc++-system-header cstdint
-
-$(ARCHDIR)/source_location.o:
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -xc++-system-header source_location
+$(STDLIB_OBJS): %.o:
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -xc++-system-header $*
 
 
 clean:
@@ -85,6 +83,6 @@ clean:
 
 install: myos.kernel
 	mkdir -p $(DESTDIR)$(BOOTDIR)
-	cp myos.kernel $(DESTDIR)$(BOOTDIR)
+	cp $< $(DESTDIR)$(BOOTDIR)
 
 -include $(OBJS:.o=.d)

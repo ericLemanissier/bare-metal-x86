@@ -50,7 +50,7 @@ myos.iso: sysroot/boot/myos.kernel grub.cfg
 
 	cp sysroot/boot/myos.kernel isodir/boot/myos.kernel
 	cp grub.cfg isodir/boot/grub/grub.cfg
-	grub-mkrescue -o myos.iso isodir
+	grub-mkrescue -o $@ isodir
 
 qemu: myos.iso
-	qemu-system-i386 -cdrom myos.iso -serial stdio
+	qemu-system-i386 -cdrom $< -serial stdio
