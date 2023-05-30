@@ -12,9 +12,12 @@ namespace Keyboard {
 
     void interrupt(uint8_t d)
     {
-        write_serial(d & 0x80 ? "Key released: " : "Key pressed: ");
-        write_serial<16>(d & 0x7F);
-        write_serial("\n");
+        if constexpr (false)
+        {
+            write_serial(d & 0x80 ? "Key released: " : "Key pressed: ");
+            write_serial<16>(d & 0x7F);
+            write_serial("\n");
+        }
         keys_pressed.set(d & 0x7f, !(d & 0x80));
     }
 

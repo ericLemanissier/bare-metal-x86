@@ -86,7 +86,7 @@ extern "C" void isr_kbd_int()
 	outb(0xA0,0x20);
 }
 
-extern "C" void do_syscalls(int num){
+extern "C" void do_syscalls(int num [[maybe_unused]]){
 	debug("Syscall !\n");
 	std::abort();
 }

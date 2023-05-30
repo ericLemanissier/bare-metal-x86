@@ -4,7 +4,11 @@ import serial;
 import debug;
 import multiboot;
 import <cstdint>;
+import <cstdlib>;
+import <array>;
+import <algorithm>;
 import geom;
+import ll;
 
 export enum Color
 {
@@ -20,6 +24,14 @@ export enum Color
 
 export class Pixel
 {
+public:
+    static constexpr auto MAX_WIDTH = 1024;
+    static constexpr auto MAX_HEIGHT = 768;
+    static constexpr auto BPP = 32;
+
+private:
+
+    static std::array<uint8_t, MAX_WIDTH * MAX_HEIGHT * BPP / 8> buf;
 
     uint64_t framebuffer_addr{};
     uint32_t framebuffer_pitch{};
@@ -28,6 +40,7 @@ export class Pixel
     uint8_t framebuffer_bpp{};
     uint8_t framebuffer_type{};
 
+    uint8_t state = 0;
 public:
     explicit Pixel(const multiboot_info& mbi)
     {
@@ -67,29 +80,73 @@ public:
             this->framebuffer_type = mbi.framebuffer_type;
             this->framebuffer_width = mbi.framebuffer_width;
 
-            if(this->framebuffer_bpp != 32)
+            if(this->framebuffer_bpp != BPP)
             {
 	            debug("Huho, wrong framebuffer bpp :/");
-                while(true){};
+                std::abort();
+            }
+            if(this->framebuffer_height > MAX_HEIGHT)
+            {
+	            debug("Huho, framebuffer height too big :/");
+                std::abort();
+            }
+            if(this->framebuffer_width > MAX_WIDTH)
+            {
+	            debug("Huho, framebuffer width too big :/");
+                std::abort();
             }
         }
     }
 
     void fill_rect(Rect r, uint32_t color)
     {
-        auto line_start = reinterpret_cast<uint8_t*>(this->framebuffer_addr);
+        auto line_start = reinterpret_cast<uint8_t*>(buf.data());
         line_start += r.top_left().x * 4;
         line_start += r.top_left().y * this->framebuffer_pitch;
-        for(int j = 0; j < r.height(); j++)
+        for(std::size_t j = 0; j < r.height(); j++)
         {
-            auto p = line_start;
-            for(int i = 0; i < r.width(); i++)
-            {
-                *reinterpret_cast<uint32_t*>(p) = color;
-                p += 4;
-            }
+            std::fill_n(reinterpret_cast<uint32_t*>(line_start), r.width(), color);
             line_start += this->framebuffer_pitch;
         }
+    }
+
+    void clear_screen()
+    {
+        std::fill_n(buf.data(), framebuffer_width*framebuffer_height*BPP/8, static_cast<uint8_t>(0));
+    }
+
+    void fill_screen(uint32_t color)
+    {
+        std::fill_n(reinterpret_cast<uint32_t*>(buf.data()), framebuffer_width*framebuffer_height, color);
+    }
+
+    void update_screen()
+    {
+        std::copy_n(reinterpret_cast<uint32_t*>(buf.data()), framebuffer_width*framebuffer_height, reinterpret_cast<uint32_t*>(this->framebuffer_addr));
+
+    }
+
+    bool should_repaint()
+    {
+        const auto val = inb(0x03DA);
+        switch(state)
+        {
+        case 0:
+            if((val & 0x08) == 0x08)
+            {
+                state++;
+            }
+            break;
+        case 1:
+            if((val & 0x08) == 0)
+            {
+                state = 0;
+                return true;
+            }
+        }
+        return false;
 
     }
 };
+
+std::array<uint8_t, Pixel::MAX_WIDTH * Pixel::MAX_HEIGHT * Pixel::BPP / 8> Pixel::buf = {};

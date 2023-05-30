@@ -29,6 +29,8 @@ LDFLAGS+= $(KERNEL_ARCH_LDFLAGS)
 LIBS+= $(KERNEL_ARCH_LIBS)
 
 KERNEL_OBJS=\
+kernel/memmove.o \
+kernel/memset.o \
 kernel/debug.o \
 kernel/geom.o \
 kernel/keyboard.o \
@@ -44,7 +46,8 @@ cstdint.o \
 source_location.o \
 cstdlib.o \
 bitset.o \
-
+array.o \
+algorithm.o \
 
 OBJS=\
 $(ARCHDIR)/crti.o \

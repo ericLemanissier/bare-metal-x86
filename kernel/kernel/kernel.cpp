@@ -87,19 +87,31 @@ void kernel_main(const multiboot_info *multiboot_info_pointer, uint32_t multiboo
 
 	debug("Hello debug world!");
 
-	pixel_screen.fill_rect(Rect{Point{90, 90}, Size{120,100}}, YELLOW);
-	pixel_screen.fill_rect(Rect{Point{100, 100}, Size{50,80}}, CYAN);
-	pixel_screen.fill_rect(Rect{Point{150, 100}, Size{50,30}}, MAGENTA);
+	auto pos = Point{90, 90};
+
+	const auto repaint = [&]()
+	{
+		pixel_screen.clear_screen();
+		pixel_screen.fill_rect(Rect{pos, Size{120,100}}, YELLOW);
+		pixel_screen.fill_rect(Rect{Point{pos.x + 10, pos.y + 10}, Size{50,80}}, CYAN);
+		pixel_screen.fill_rect(Rect{Point{pos.x + 60, pos.y + 10}, Size{50,30}}, MAGENTA);
+	};
 	while (1)
     {
     	asm volatile ( "hlt" );
 		if(Keyboard::is_key_pressed(0x48))
-			write_serial("up!\n");
+			pos.y--;
 		if(Keyboard::is_key_pressed(0x4B))
-			write_serial("left!\n");
+			pos.x--;
 		if(Keyboard::is_key_pressed(0x4D))
-			write_serial("right!\n");
+			pos.x++;
 		if(Keyboard::is_key_pressed(0x50))
-			write_serial("down!\n");
+			pos.y++;
+
+		repaint();
+		if(pixel_screen.should_repaint())
+		{
+			pixel_screen.update_screen();
+		}
 	}
 }

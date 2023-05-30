@@ -1,0 +1,12 @@
+{
+    "C_Cpp.default.cppStandard": "c++20",
+    "files.associations": {
+        "cstdint": "cpp",
+        "compare": "cpp",
+        "array": "cpp",
+        "ranges": "cpp",
+        "span": "cpp",
+        "string_view": "cpp",
+        "string": "cpp"
+    }
+}
