@@ -31,8 +31,10 @@ LIBS+= $(KERNEL_ARCH_LIBS)
 KERNEL_OBJS=\
 kernel/debug.o \
 kernel/geom.o \
+kernel/keyboard.o \
 $(KERNEL_ARCH_OBJS) \
 kernel/debug_impl.o \
+kernel/keyboard_impl.o \
 kernel/pixel.o \
 kernel/kernel.o \
 
@@ -40,6 +42,8 @@ STDLIB_OBJS=\
 cstddef.o \
 cstdint.o \
 source_location.o \
+cstdlib.o \
+bitset.o \
 
 
 OBJS=\

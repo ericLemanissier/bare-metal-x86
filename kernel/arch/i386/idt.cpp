@@ -1,10 +1,12 @@
 export module idt;
 
 import <cstdint>;
+import <cstdlib>;
 import ll;
 import debug;
 import serial;
 import ticks;
+import keyboard;
 
 
 
@@ -78,11 +80,7 @@ extern "C" void isr_timer_int()
 
 extern "C" void isr_kbd_int()
 {
-    debug("Keyboard int!");
-
-
-    uint8_t d = inb(0x60);
-    write_serial(d);write_serial("\n");
+	Keyboard::interrupt(inb(0x60));
 
 	outb(0x20,0x20);
 	outb(0xA0,0x20);
@@ -90,18 +88,18 @@ extern "C" void isr_kbd_int()
 
 extern "C" void do_syscalls(int num){
 	debug("Syscall !\n");
-    asm("hlt");
+	std::abort();
 }
 
 
 extern "C" void isr_GP_exc(void)
 {
 	debug("\n General protection fault !\n");
-    asm("hlt");
+	std::abort();
 }
 
 extern "C" void isr_PF_exc(void)
 {
 	debug("\n Protection Fault !\n");
-    asm("hlt");
+	std::abort();
 }

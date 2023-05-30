@@ -27,6 +27,7 @@ import gdt;
 import pic;
 import pit;
 import pixel;
+import keyboard;
 
 
 void kernel_main(const multiboot_info *multiboot_info_pointer, uint32_t multiboot_magic_value)
@@ -92,5 +93,13 @@ void kernel_main(const multiboot_info *multiboot_info_pointer, uint32_t multiboo
 	while (1)
     {
     	asm volatile ( "hlt" );
+		if(Keyboard::is_key_pressed(0x48))
+			write_serial("up!\n");
+		if(Keyboard::is_key_pressed(0x4B))
+			write_serial("left!\n");
+		if(Keyboard::is_key_pressed(0x4D))
+			write_serial("right!\n");
+		if(Keyboard::is_key_pressed(0x50))
+			write_serial("down!\n");
 	}
 }
