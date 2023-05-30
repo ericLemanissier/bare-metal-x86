@@ -26,10 +26,10 @@ idtdesc 	kidt[IDTSIZE]; 		/* IDT table */
 
 void init_idt_desc(uint16_t select, uint32_t offset, uint16_t type, struct idtdesc *desc)
 {
-    desc->offset0_15 = (offset & 0xffff);
+    desc->offset0_15 = (offset & 0xffffu);
     desc->select = select;
     desc->type = type;
-    desc->offset16_31 = (offset & 0xffff0000) >> 16;
+    desc->offset16_31 = (offset & 0xffff0000u) >> 16u;
     return;
 }
 

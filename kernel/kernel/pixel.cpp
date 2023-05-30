@@ -29,7 +29,7 @@ export class Pixel
     uint8_t framebuffer_type{};
 
 public:
-    Pixel(const multiboot_info& mbi)
+    explicit Pixel(const multiboot_info& mbi)
     {
 
         if(mbi.flags & 0x800)

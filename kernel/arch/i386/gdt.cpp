@@ -25,13 +25,13 @@ gdtdesc 	kgdt[GDTSIZE];		/* GDT */
  */
 void init_gdt_desc(uint32_t base, uint32_t limite, uint8_t acces, uint8_t other,struct gdtdesc *desc)
 {
-	desc->lim0_15 = (limite & 0xffff);
-	desc->base0_15 = (base & 0xffff);
-	desc->base16_23 = (base & 0xff0000) >> 16;
+	desc->lim0_15 = (limite & 0xffffu);
+	desc->base0_15 = (base & 0xffffu);
+	desc->base16_23 = (base & 0xff0000u) >> 16u;
 	desc->acces = acces;
-	desc->lim16_19 = (limite & 0xf0000) >> 16;
+	desc->lim16_19 = (limite & 0xf0000u) >> 16u;
 	desc->other = (other & 0xf);
-	desc->base24_31 = (base & 0xff000000) >> 24;
+	desc->base24_31 = (base & 0xff000000u) >> 24u;
 	return;
 }
 

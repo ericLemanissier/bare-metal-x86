@@ -24,7 +24,7 @@
             },
             {
                 "text": "break kernel_main",
-                "description": "Break on main.",
+                "description": "Break on main."
             }
         ],
         "preLaunchTask": "Launch QEMU"

@@ -50,7 +50,7 @@ void kernel_main(const multiboot_info *multiboot_info_pointer, uint32_t multiboo
 		write_serial(multiboot_info_pointer->boot_loader_name);write_serial("\n");
 	}
 
-	Pixel pixel(*multiboot_info_pointer);
+	Pixel pixel_screen(*multiboot_info_pointer);
 
 	enable_interrupts();
 	disable_cursor();
@@ -86,9 +86,9 @@ void kernel_main(const multiboot_info *multiboot_info_pointer, uint32_t multiboo
 
 	debug("Hello debug world!");
 
-	pixel.fill_rect(Rect{Point{90, 90}, Size{120,100}}, YELLOW);
-	pixel.fill_rect(Rect{Point{100, 100}, Size{50,80}}, CYAN);
-	pixel.fill_rect(Rect{Point{150, 100}, Size{50,30}}, MAGENTA);
+	pixel_screen.fill_rect(Rect{Point{90, 90}, Size{120,100}}, YELLOW);
+	pixel_screen.fill_rect(Rect{Point{100, 100}, Size{50,80}}, CYAN);
+	pixel_screen.fill_rect(Rect{Point{150, 100}, Size{50,30}}, MAGENTA);
 	while (1)
     {
     	asm volatile ( "hlt" );
