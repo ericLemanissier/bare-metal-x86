@@ -31,7 +31,7 @@ public:
 
 private:
 
-    static std::array<uint8_t, MAX_WIDTH * MAX_HEIGHT * BPP / 8> buf;
+    static std::array<uint32_t, MAX_WIDTH * MAX_HEIGHT * BPP / 32> buf;
 
     uint64_t framebuffer_addr{};
     uint32_t framebuffer_pitch{};
@@ -100,29 +100,29 @@ public:
 
     void fill_rect(Rect r, uint32_t color)
     {
-        auto line_start = reinterpret_cast<uint8_t*>(buf.data());
-        line_start += r.top_left().x * 4;
-        line_start += r.top_left().y * this->framebuffer_pitch;
+        auto line_start = buf.data();
+        line_start += r.top_left().x;
+        line_start += r.top_left().y * this->framebuffer_pitch/4;
         for(std::size_t j = 0; j < r.height(); j++)
         {
-            std::fill_n(reinterpret_cast<uint32_t*>(line_start), r.width(), color);
-            line_start += this->framebuffer_pitch;
+            std::fill_n(line_start, r.width(), color);
+            line_start += this->framebuffer_pitch/4;
         }
     }
 
     void clear_screen()
     {
-        std::fill_n(buf.data(), framebuffer_width*framebuffer_height*BPP/8, static_cast<uint8_t>(0));
+        std::fill_n(buf.data(), framebuffer_width*framebuffer_height, 0);
     }
 
     void fill_screen(uint32_t color)
     {
-        std::fill_n(reinterpret_cast<uint32_t*>(buf.data()), framebuffer_width*framebuffer_height, color);
+        std::fill_n(buf.data(), framebuffer_width*framebuffer_height, color);
     }
 
     void update_screen()
     {
-        std::copy_n(reinterpret_cast<uint32_t*>(buf.data()), framebuffer_width*framebuffer_height, reinterpret_cast<uint32_t*>(this->framebuffer_addr));
+        std::copy_n(buf.data(), framebuffer_width*framebuffer_height, reinterpret_cast<uint32_t*>(this->framebuffer_addr));
 
     }
 
@@ -149,4 +149,4 @@ public:
     }
 };
 
-std::array<uint8_t, Pixel::MAX_WIDTH * Pixel::MAX_HEIGHT * Pixel::BPP / 8> Pixel::buf = {};
+std::array<uint32_t, Pixel::MAX_WIDTH * Pixel::MAX_HEIGHT * Pixel::BPP / 32> Pixel::buf = {};

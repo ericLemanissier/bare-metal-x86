@@ -96,17 +96,18 @@ void kernel_main(const multiboot_info *multiboot_info_pointer, uint32_t multiboo
 		pixel_screen.fill_rect(Rect{Point{pos.x + 10, pos.y + 10}, Size{50,80}}, CYAN);
 		pixel_screen.fill_rect(Rect{Point{pos.x + 60, pos.y + 10}, Size{50,30}}, MAGENTA);
 	};
+	const auto speed = 1;
 	while (1)
     {
     	asm volatile ( "hlt" );
 		if(Keyboard::is_key_pressed(0x48))
-			pos.y--;
+			pos.y-=speed;
 		if(Keyboard::is_key_pressed(0x4B))
-			pos.x--;
+			pos.x-=speed;
 		if(Keyboard::is_key_pressed(0x4D))
-			pos.x++;
+			pos.x+=speed;
 		if(Keyboard::is_key_pressed(0x50))
-			pos.y++;
+			pos.y+=speed;
 
 		repaint();
 		if(pixel_screen.should_repaint())

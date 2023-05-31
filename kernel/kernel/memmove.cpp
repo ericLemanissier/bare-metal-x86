@@ -1,14 +1,19 @@
 import <cstddef>;
 
-extern "C" void* memmove(void* dstptr, const void* srcptr, size_t size) {
-	unsigned char* dst = (unsigned char*) dstptr;
-	const unsigned char* src = (const unsigned char*) srcptr;
-	if (dst < src) {
-		for (size_t i = 0; i < size; i++)
-			dst[i] = src[i];
-	} else {
-		for (size_t i = size; i != 0; i--)
-			dst[i-1] = src[i-1];
-	}
-	return dstptr;
+extern "C" void *
+memmove (char *dest, const char *src, size_t len)
+{
+  char *d = dest;
+  const char *s = src;
+  if (d < s)
+    while (len--)
+      *d++ = *s++;
+  else
+    {
+      const char *lasts = s + (len-1);
+      char *lastd = d + (len-1);
+      while (len--)
+        *lastd-- = *lasts--;
+    }
+  return dest;
 }

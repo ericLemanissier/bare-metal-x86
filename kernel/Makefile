@@ -15,7 +15,7 @@ BOOTDIR?=$(EXEC_PREFIX)/boot
 CFLAGS+= -ffreestanding -Wall -Wextra -Wimplicit -flto
 CPPFLAGS+= -D__is_kernel
 CXXFLAGS+= -ffreestanding -Wall -Wextra -fno-exceptions -fno-rtti -std=c++20  -fmodules-ts -flto
-LDFLAGS+= -ffreestanding -O2 -flto
+LDFLAGS+=
 LIBS+= -nostdlib -lgcc
 
 ARCHDIR=arch/$(HOSTARCH)
@@ -31,6 +31,7 @@ LIBS+= $(KERNEL_ARCH_LIBS)
 KERNEL_OBJS=\
 kernel/memmove.o \
 kernel/memset.o \
+kernel/memcpy.o \
 kernel/debug.o \
 kernel/geom.o \
 kernel/keyboard.o \

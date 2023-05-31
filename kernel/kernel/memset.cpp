@@ -1,8 +1,11 @@
 import <cstddef>;
 
-extern "C" void* memset(void* bufptr, int value, size_t size) {
-	unsigned char* buf = (unsigned char*) bufptr;
-	for (size_t i = 0; i < size; i++)
-		buf[i] = (unsigned char) value;
-	return bufptr;
+extern "C"
+void *
+memset (unsigned char *dest, int val, size_t len)
+{
+  unsigned char *ptr = dest;
+  while (len-- > 0)
+    *ptr++ = val;
+  return dest;
 }
