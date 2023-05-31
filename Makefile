@@ -13,9 +13,9 @@ export EXEC_PREFIX=$(PREFIX)
 export BOOTDIR=/boot
 export LIBDIR=$(EXEC_PREFIX)/lib
 
-export CFLAGS=-O2 -g
+export CFLAGS=-O3 -g
 export CPPFLAGS=
-export CXXFLAGS=-O2 -g
+export CXXFLAGS=-O3 -g
 
 # Configure the cross-compiler to use the desired system root.
 export SYSROOT=$(shell pwd)/sysroot

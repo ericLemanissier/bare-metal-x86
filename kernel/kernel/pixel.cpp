@@ -31,7 +31,7 @@ public:
 
 private:
 
-    static std::array<uint32_t, MAX_WIDTH * MAX_HEIGHT * BPP / 32> buf;
+    alignas(64) static std::array<uint32_t, MAX_WIDTH * MAX_HEIGHT * BPP / 32> buf;
 
     uint64_t framebuffer_addr{};
     uint32_t framebuffer_pitch{};
@@ -112,7 +112,7 @@ public:
 
     void clear_screen()
     {
-        std::fill_n(buf.data(), framebuffer_width*framebuffer_height, 0);
+        std::fill_n(reinterpret_cast<std::byte*>(buf.data()), framebuffer_width*framebuffer_height * 4, std::byte{});
     }
 
     void fill_screen(uint32_t color)
