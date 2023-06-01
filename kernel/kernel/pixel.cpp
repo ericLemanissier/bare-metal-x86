@@ -41,6 +41,11 @@ private:
     uint8_t framebuffer_type{};
 
     uint8_t state = 0;
+
+    auto get_addr(Point p)
+    {
+        return buf.data() + p.x + p.y * this->framebuffer_pitch/4;
+    }
 public:
     explicit Pixel(const multiboot_info& mbi)
     {
@@ -98,16 +103,58 @@ public:
         }
     }
 
+    auto width() const
+    {
+        return this->framebuffer_width;
+    }
+    auto height() const
+    {
+        return this->framebuffer_height;
+    }
+
+    auto size() const
+    {
+        return Size(width(), height());
+    }
+
+
     void fill_rect(Rect r, uint32_t color)
     {
-        auto line_start = buf.data();
-        line_start += r.top_left().x;
-        line_start += r.top_left().y * this->framebuffer_pitch/4;
+        auto line_start = get_addr(r.top_left());
         for(std::size_t j = 0; j < r.height(); j++)
         {
             std::fill_n(line_start, r.width(), color);
             line_start += this->framebuffer_pitch/4;
         }
+    }
+
+    void fill_circle(Point center, std::size_t radius, uint32_t color)
+    {
+        const auto radius2 = radius*radius;
+
+        auto top_line = get_addr(center);
+        auto bottom_line = top_line;
+
+        std::fill(top_line - radius, top_line + radius, color);
+
+        for(std::size_t y = 1; y <= radius;y++)
+        {
+            top_line -= framebuffer_pitch/4;
+            bottom_line += framebuffer_pitch/4;
+            const auto expected = radius2 - y*y;
+            for(std::size_t x = radius - y; x <= radius; x++)
+                if(x*x >= expected)
+                {
+                    std::fill(top_line - x, top_line + x, color);
+                    std::fill(bottom_line - x, bottom_line + x, color);
+                    break;
+                }
+        }
+    }
+
+    void fill_circle(Rect rect, uint32_t color)
+    {
+        fill_circle(rect.center(), rect.width() / 2, color);
     }
 
     void clear_screen()

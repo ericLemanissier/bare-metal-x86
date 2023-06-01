@@ -1,12 +1,13 @@
 export module geom;
 
 import <cstddef>;
+import <cstdint>;
 
 
 export struct Point
 {
-	size_t x{};
-	size_t y{};
+	int32_t x{};
+	int32_t y{};
 };
 
 export struct Size
@@ -48,5 +49,10 @@ export struct Rect
 	constexpr size_t height() const
 	{
 		return size.h;
+	}
+
+	constexpr Point center() const
+	{
+		return {m_top_left.x + width()/2, m_top_left.y + height()/2};
 	}
 };

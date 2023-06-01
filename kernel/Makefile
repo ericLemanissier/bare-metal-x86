@@ -19,8 +19,10 @@ LDFLAGS+=
 LIBS+= -nostdlib -lgcc
 
 ARCHDIR=arch/$(HOSTARCH)
+APPDIR=app
 
 include $(ARCHDIR)/make.config
+include $(APPDIR)/make.config
 
 CFLAGS+= $(KERNEL_ARCH_CFLAGS)
 CPPFLAGS+= $(KERNEL_ARCH_CPPFLAGS)
@@ -39,6 +41,7 @@ $(KERNEL_ARCH_OBJS) \
 kernel/debug_impl.o \
 kernel/keyboard_impl.o \
 kernel/pixel.o \
+$(APP_OBJS) \
 kernel/kernel.o \
 
 STDLIB_OBJS=\
