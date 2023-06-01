@@ -1,6 +1,3 @@
-SYSTEM_HEADER_PROJECTS="kernel"
-PROJECTS="kernel"
-
 export HOST=i686-elf
 
 export AR=${HOST}-ar
@@ -27,9 +24,7 @@ CXX+= --sysroot=$(SYSROOT)
 .DEFAULT_GOAL := myos.iso
 
 clean:
-	for PROJECT in $(PROJECTS); do \
-	(cd $$PROJECT && $(MAKE) clean) \
-	done
+	cd os && $(MAKE) clean
 	$(RM) -r sysroot
 	$(RM) -r isodir
 	$(RM) myos.iso
@@ -37,9 +32,7 @@ clean:
 
 build:
 	export PATH="$(shell pwd)/opt/cross/bin:${PATH}" && \
-	for PROJECT in $(PROJECTS); do \
-	(cd $$PROJECT && DESTDIR="$(SYSROOT)" $(MAKE) install) \
-	done
+	cd os && DESTDIR="$(SYSROOT)" $(MAKE) install
 
 sysroot/boot/myos.kernel: build
 
