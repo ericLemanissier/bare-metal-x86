@@ -27,9 +27,8 @@ import gdt;
 import pic;
 import pit;
 import pixel;
-import keyboard;
 import ticks;
-import ball;
+import game;
 
 void kernel_main(const multiboot_info *multiboot_info_pointer, uint32_t multiboot_magic_value)
 {
@@ -88,42 +87,7 @@ void kernel_main(const multiboot_info *multiboot_info_pointer, uint32_t multiboo
 
 	debug("Hello debug world!");
 
-	auto pos = Point{90, 90};
-	Ball b(Point(10,10), Speed(0.3, 0.1), Size(10, 10), pixel_screen.size());
-
-	const auto repaint = [&]()
-	{
-		pixel_screen.clear_screen();
-		pixel_screen.fill_rect(Rect{pos, Size{120,100}}, YELLOW);
-		pixel_screen.fill_rect(Rect{Point{pos.x + 10, pos.y + 10}, Size{50,80}}, CYAN);
-		pixel_screen.fill_rect(Rect{Point{pos.x + 60, pos.y + 10}, Size{50,30}}, MAGENTA);
-
-		pixel_screen.fill_circle(Point(
-			b.pos().x + b.size().w/2,
-			b.pos().y + b.size().h/2), b.size().w/2, BLUE);
-	};
-
-	const auto speed = 0.2;
-
-
-	const auto update_world = [&](const auto duration)
-	{
-		if(Keyboard::is_key_pressed(0x48))
-			pos.y-=speed*duration;
-		if(Keyboard::is_key_pressed(0x4B))
-			pos.x-=speed*duration;
-		if(Keyboard::is_key_pressed(0x4D))
-			pos.x+=speed*duration;
-		if(Keyboard::is_key_pressed(0x50))
-			pos.y+=speed*duration;
-		if(pos.x < 0) pos.x = 0;
-		if(pos.x + 120 >= pixel_screen.width()) pos.x = pixel_screen.width() - 120;
-		if(pos.y < 0) pos.y = 0;
-		if(pos.y + 100 >= pixel_screen.height()) pos.y = pixel_screen.height() - 100;
-
-		b.update(duration);
-
-	};
+	Game g(pixel_screen.size());
 
 
 	auto last_update = get_tick();
@@ -134,9 +98,9 @@ void kernel_main(const multiboot_info *multiboot_info_pointer, uint32_t multiboo
 
 		if(cur_tick >= last_update + 10)
 		{
-			update_world(cur_tick - last_update);
+			g.update(cur_tick - last_update);
 			last_update = cur_tick;
-			repaint();
+			g.draw(pixel_screen);
 		}
 
 		if(pixel_screen.should_repaint())

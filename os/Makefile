@@ -14,7 +14,7 @@ BOOTDIR?=$(EXEC_PREFIX)/boot
 
 CFLAGS+= -ffreestanding -Wall -Wextra -Wimplicit -flto
 CPPFLAGS+= -D__is_kernel
-CXXFLAGS+= -ffreestanding -Wall -Wextra -fno-exceptions -fno-rtti -std=c++20  -fmodules-ts -flto
+CXXFLAGS+= -ffreestanding -Wall -Wextra -fno-exceptions -fno-rtti -std=c++23  -fmodules-ts -flto
 LDFLAGS+=
 LIBS+= -nostdlib -lgcc
 
@@ -52,6 +52,7 @@ cstdlib.o \
 bitset.o \
 array.o \
 algorithm.o \
+$(APP_STDLIB_OBJS) \
 
 OBJS=\
 $(ARCHDIR)/crti.o \
