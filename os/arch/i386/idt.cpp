@@ -12,10 +12,10 @@ import keyboard;
 
 /* Descripteur de segment */
 struct idtdesc {
-	uint16_t offset0_15{};
-	uint16_t select{};
-	uint16_t type{};
-	uint16_t offset16_31{};
+    uint16_t offset0_15{};
+    uint16_t select{};
+    uint16_t type{};
+    uint16_t offset16_31{};
 } __attribute__ ((packed));
 
 constexpr auto IDTSIZE = 0xFF;	/* nombre max. de descripteurs dans la table */
@@ -50,15 +50,15 @@ export void init_idt(void)
         init_idt_desc(0x08, (uint32_t)_asm_schedule, INTGATE, &e); //
     }
 
-	/* Vectors  0 -> 31 are for exceptions */
-	init_idt_desc(0x08, (uint32_t) _asm_exc_GP, INTGATE, &kidt[13]);		/* #GP */
-	init_idt_desc(0x08, (uint32_t) _asm_exc_PF, INTGATE, &kidt[14]);     /* #PF */
+    /* Vectors  0 -> 31 are for exceptions */
+    init_idt_desc(0x08, (uint32_t) _asm_exc_GP, INTGATE, &kidt[13]);		/* #GP */
+    init_idt_desc(0x08, (uint32_t) _asm_exc_PF, INTGATE, &kidt[14]);     /* #PF */
 
-	init_idt_desc(0x08, (uint32_t) _asm_timer, INTGATE, &kidt[32]);
-	init_idt_desc(0x08, (uint32_t) _asm_int_kbd, INTGATE, &kidt[33]);
+    init_idt_desc(0x08, (uint32_t) _asm_timer, INTGATE, &kidt[32]);
+    init_idt_desc(0x08, (uint32_t) _asm_int_kbd, INTGATE, &kidt[33]);
 
-	init_idt_desc(0x08, (uint32_t) _asm_syscalls, TRAPGATE, &kidt[48]);
-	init_idt_desc(0x08, (uint32_t) _asm_syscalls, TRAPGATE, &kidt[128]); //48
+    init_idt_desc(0x08, (uint32_t) _asm_syscalls, TRAPGATE, &kidt[48]);
+    init_idt_desc(0x08, (uint32_t) _asm_syscalls, TRAPGATE, &kidt[128]); //48
 
 
     lidt(kidt, IDTSIZE * 8);
@@ -67,39 +67,39 @@ export void init_idt(void)
 
 extern "C" void isr_schedule_int()
 {
-	outb(0x20,0x20);
-	outb(0xA0,0x20);
+    outb(0x20,0x20);
+    outb(0xA0,0x20);
 }
 
 extern "C" void isr_timer_int()
 {
     inc_ticks();
-	outb(0x20,0x20);
-	outb(0xA0,0x20);
+    outb(0x20,0x20);
+    outb(0xA0,0x20);
 }
 
 extern "C" void isr_kbd_int()
 {
-	Keyboard::interrupt(inb(0x60));
+    Keyboard::interrupt(inb(0x60));
 
-	outb(0x20,0x20);
-	outb(0xA0,0x20);
+    outb(0x20,0x20);
+    outb(0xA0,0x20);
 }
 
 extern "C" void do_syscalls(int num [[maybe_unused]]){
-	debug("Syscall !\n");
-	std::abort();
+    debug("Syscall !\n");
+    std::abort();
 }
 
 
 extern "C" void isr_GP_exc(void)
 {
-	debug("\n General protection fault !\n");
-	std::abort();
+    debug("\n General protection fault !\n");
+    std::abort();
 }
 
 extern "C" void isr_PF_exc(void)
 {
-	debug("\n Protection Fault !\n");
-	std::abort();
+    debug("\n Protection Fault !\n");
+    std::abort();
 }

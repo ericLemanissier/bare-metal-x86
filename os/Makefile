@@ -44,20 +44,20 @@ kernel/pixel.o \
 $(APP_OBJS) \
 kernel/kernel.o \
 
-STDLIB_OBJS=\
-cstddef.o \
-cstdint.o \
-source_location.o \
-cstdlib.o \
-bitset.o \
-array.o \
-algorithm.o \
-$(APP_STDLIB_OBJS) \
+STDLIB_MODULES=\
+$(KERNEL_STD_MODULES) \
+cstddef.gcm \
+cstdint.gcm \
+source_location.gcm \
+cstdlib.gcm \
+bitset.gcm \
+array.gcm \
+algorithm.gcm \
+$(APP_STDLIB_MODULES) \
 
 OBJS=\
 $(ARCHDIR)/crti.o \
 $(ARCHDIR)/crtbegin.o \
-$(STDLIB_OBJS) \
 $(KERNEL_OBJS) \
 $(ARCHDIR)/crtend.o \
 $(ARCHDIR)/crtn.o \
@@ -71,7 +71,7 @@ $(LIBS) \
 $(ARCHDIR)/crtend.o \
 $(ARCHDIR)/crtn.o \
 
-.PHONY: all clean install
+.PHONY: all clean install $(STDLIB_MODULES)
 .SUFFIXES: .o .c .S
 
 all: myos.kernel
@@ -83,9 +83,10 @@ myos.kernel: $(OBJS) $(ARCHDIR)/linker.ld
 $(ARCHDIR)/crtbegin.o $(ARCHDIR)/crtend.o:
 	OBJ=`$(CXX) $(CFLAGS) $(LDFLAGS) -print-file-name=$(@F)` && cp "$$OBJ" $@
 
-$(STDLIB_OBJS): %.o:
+$(STDLIB_MODULES): %.gcm:
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -xc++-system-header $*
 
+$(OBJS): $(STDLIB_MODULES)
 
 clean:
 	$(RM) myos.kernel

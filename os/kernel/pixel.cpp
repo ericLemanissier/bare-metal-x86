@@ -87,17 +87,17 @@ public:
 
             if(this->framebuffer_bpp != BPP)
             {
-	            debug("Huho, wrong framebuffer bpp :/");
+                debug("Huho, wrong framebuffer bpp :/");
                 std::abort();
             }
             if(this->framebuffer_height > MAX_HEIGHT)
             {
-	            debug("Huho, framebuffer height too big :/");
+                debug("Huho, framebuffer height too big :/");
                 std::abort();
             }
             if(this->framebuffer_width > MAX_WIDTH)
             {
-	            debug("Huho, framebuffer width too big :/");
+                debug("Huho, framebuffer width too big :/");
                 std::abort();
             }
         }
