@@ -24,6 +24,12 @@ inline void write_serial(const char*s)
 template<int b = 10>
 inline void write_serial(const auto i)
 {
+   if(i < 0)
+   {
+      write_serial("-");
+      write_serial<b>(-i);
+      return;
+   }
    if(const auto high = i / b)
       write_serial<b>(high);
    const auto n = i % b;
