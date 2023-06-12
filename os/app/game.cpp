@@ -1,9 +1,10 @@
 export module game;
 
 import <cstdint>;
+import <numbers>;
+import <array>;
 import geom;
 import pixel;
-import <array>;
 import keyboard;
 import collision;
 
@@ -51,7 +52,7 @@ export class Game
 public:
     explicit Game(const Size &world_size):
     m_size(world_size),
-    m_ball(Rect(Point(10,10), Size(10, 10)), {0.2, 0.6}),
+    m_ball(Rect(Point(10,10), Size(10, 10)), {0.1, 0.3}),
     m_paddle(Point((m_size.w - Paddle::SIZE.w) / 2,
                     m_size.h -Paddle::SIZE.h))
     {
@@ -127,6 +128,15 @@ public:
                     remaining-=collision->t;
                     if(paddleColision)
                     {
+                        const auto mod = __builtin_sqrt(m_ball.speed.x * m_ball.speed.x + m_ball.speed.y * m_ball.speed.y);
+                        const auto angle = (m_ball.r.center() - m_paddle.rect().center()).x*std::numbers::pi_v<double> / m_paddle.rect().width();
+                        m_ball.speed.x = __builtin_sin(angle) * mod;
+                        m_ball.speed.y = -__builtin_cos(angle) * mod;
+                    }
+                    else
+                    {
+                        m_ball.speed.x *= 1.05;
+                        m_ball.speed.y *= 1.05;
                     }
                 }
                 else

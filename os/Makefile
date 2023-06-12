@@ -12,9 +12,9 @@ EXEC_PREFIX?=$(PREFIX)
 BOOTDIR?=$(EXEC_PREFIX)/boot
 
 
-CFLAGS+= -ffreestanding -Wall -Wextra -Wimplicit -flto
-CPPFLAGS+= -D__is_kernel
-CXXFLAGS+= -ffreestanding -Wall -Wextra -fno-exceptions -fno-rtti -std=c++23  -fmodules-ts -flto
+CFLAGS+= -ffreestanding -Wall -Wextra -Wimplicit -flto -fno-math-errno -funsafe-math-optimizations
+CPPFLAGS+=
+CXXFLAGS+= -ffreestanding -Wall -Wextra -fno-exceptions -fno-rtti -std=c++23  -fmodules-ts -flto -fno-math-errno -funsafe-math-optimizations
 LDFLAGS+=
 LIBS+= -nostdlib -lgcc
 
@@ -37,6 +37,7 @@ kernel/memcpy.o \
 kernel/debug.o \
 kernel/geom.o \
 kernel/keyboard.o \
+kernel/terminate.o \
 $(KERNEL_ARCH_OBJS) \
 kernel/debug_impl.o \
 kernel/keyboard_impl.o \
@@ -77,6 +78,7 @@ $(ARCHDIR)/crtn.o \
 all: myos.kernel
 
 myos.kernel: $(OBJS) $(ARCHDIR)/linker.ld
+	$(CXX) -v --help > help.txt
 	$(CXX) -T $(ARCHDIR)/linker.ld -o $@ $(CFLAGS) $(LINK_LIST)
 	grub-file --is-x86-multiboot $@
 
