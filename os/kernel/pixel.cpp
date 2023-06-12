@@ -117,6 +117,20 @@ public:
         return Size(width(), height());
     }
 
+    void draw_rect(Rect r, uint32_t color)
+    {
+        auto line_start = get_addr(r.top_left());
+        std::fill_n(line_start, r.width(), color);
+        line_start += this->framebuffer_pitch/4;
+        for(std::size_t j = 1; j < r.height() - 1; j++)
+        {
+            *line_start = color;
+            *(line_start + r.width() - 1) = color;
+            line_start += this->framebuffer_pitch/4;
+        }
+        std::fill_n(line_start, r.width(), color);
+    }
+
 
     void fill_rect(Rect r, uint32_t color)
     {

@@ -70,6 +70,7 @@ public:
     void draw(Pixel &pixel_screen) const
     {
         pixel_screen.clear_screen();
+        pixel_screen.draw_rect({Point{0,0}, this->m_size}, BLUE);
         pixel_screen.fill_rect(m_paddle.rect(), Paddle::color);
 
         for(const auto &b:m_bricks)
