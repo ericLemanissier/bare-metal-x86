@@ -1,12 +1,8 @@
 export module idt;
 
 import <cstdint>;
-import <cstdlib>;
 import ll;
-import debug;
-import serial;
-import ticks;
-import keyboard;
+import isr;
 
 
 
@@ -35,71 +31,31 @@ void init_idt_desc(uint16_t select, uint32_t offset, uint16_t type, struct idtde
     return;
 }
 
-extern "C" void _asm_schedule();
-extern "C" void _asm_timer();
-extern "C" void _asm_int_kbd();
-extern "C" void _asm_syscalls();
-extern "C" void _asm_exc_GP(void);
-extern "C" void _asm_exc_PF(void);
-
 export void init_idt(void)
 {
     /* Init irq */
     for (auto &e : kidt)
     {
-        init_idt_desc(0x08, (uint32_t)_asm_schedule, INTGATE, &e); //
+        init_idt_desc(0x08, (uint32_t)isr_schedule_int, 0, &e);
     }
 
     /* Vectors  0 -> 31 are for exceptions */
-    init_idt_desc(0x08, (uint32_t) _asm_exc_GP, INTGATE, &kidt[13]);		/* #GP */
-    init_idt_desc(0x08, (uint32_t) _asm_exc_PF, INTGATE, &kidt[14]);     /* #PF */
+    init_idt_desc(0x08, (uint32_t) isr_DF_exc, INTGATE, &kidt[8]);		/* #DF */
 
-    init_idt_desc(0x08, (uint32_t) _asm_timer, INTGATE, &kidt[32]);
-    init_idt_desc(0x08, (uint32_t) _asm_int_kbd, INTGATE, &kidt[33]);
+    init_idt_desc(0x08, (uint32_t) isr_GP_exc, INTGATE, &kidt[13]);		/* #GP */
+    init_idt_desc(0x08, (uint32_t) isr_PF_exc, INTGATE, &kidt[14]);     /* #PF */
 
-    init_idt_desc(0x08, (uint32_t) _asm_syscalls, TRAPGATE, &kidt[48]);
-    init_idt_desc(0x08, (uint32_t) _asm_syscalls, TRAPGATE, &kidt[128]); //48
+    init_idt_desc(0x08, (uint32_t) isr_MF_exc, INTGATE, &kidt[16]);		/* #MF */
+    init_idt_desc(0x08, (uint32_t) isr_AC_exc, INTGATE, &kidt[17]);		/* #AC */
+    init_idt_desc(0x08, (uint32_t) isr_DF_exc, INTGATE, &kidt[18]);		/* #DF */
+    init_idt_desc(0x08, (uint32_t) isr_XMXF_exc, INTGATE, &kidt[19]);		/* #XMXF */
+
+    init_idt_desc(0x08, (uint32_t) isr_timer_int, INTGATE, &kidt[32]);
+    init_idt_desc(0x08, (uint32_t) keyboard_isr, INTGATE, &kidt[33]);
+
+    //init_idt_desc(0x08, (uint32_t) do_syscalls, TRAPGATE, &kidt[48]);
+    //init_idt_desc(0x08, (uint32_t) do_syscalls, TRAPGATE, &kidt[128]); //48
 
 
     lidt(kidt, IDTSIZE * 8);
-}
-
-
-extern "C" void isr_schedule_int()
-{
-    outb(0x20,0x20);
-    outb(0xA0,0x20);
-}
-
-extern "C" void isr_timer_int()
-{
-    inc_ticks();
-    outb(0x20,0x20);
-    outb(0xA0,0x20);
-}
-
-extern "C" void isr_kbd_int()
-{
-    Keyboard::interrupt(inb(0x60));
-
-    outb(0x20,0x20);
-    outb(0xA0,0x20);
-}
-
-extern "C" void do_syscalls(int num [[maybe_unused]]){
-    debug("Syscall !\n");
-    std::abort();
-}
-
-
-extern "C" void isr_GP_exc(void)
-{
-    debug("\n General protection fault !\n");
-    std::abort();
-}
-
-extern "C" void isr_PF_exc(void)
-{
-    debug("\n Protection Fault !\n");
-    std::abort();
 }

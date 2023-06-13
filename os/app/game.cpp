@@ -3,6 +3,7 @@ export module game;
 import <cstdint>;
 import <numbers>;
 import <array>;
+import <cstdlib>;
 import geom;
 import pixel;
 import keyboard;
@@ -166,7 +167,7 @@ public:
         }
         if(m_ball.r.bottom() >= m_size.h)
         {
-            while(1);
+            std::abort();
         }
     }
 };

@@ -1,6 +1,7 @@
 namespace std{
     void terminate()
     {
-        while(true);
+        asm volatile("cli");
+        asm volatile("hlt");
     }
 }

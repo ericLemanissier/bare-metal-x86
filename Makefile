@@ -10,9 +10,9 @@ export EXEC_PREFIX=$(PREFIX)
 export BOOTDIR=/boot
 export LIBDIR=$(EXEC_PREFIX)/lib
 
-export CFLAGS=-O3 -g
+export CFLAGS=-O3 -g -march=pentium3 -msse
 export CPPFLAGS=
-export CXXFLAGS=-O3 -g
+export CXXFLAGS=-O3 -g -march=pentium3 -msse
 
 # Configure the cross-compiler to use the desired system root.
 export SYSROOT=$(shell pwd)/sysroot
