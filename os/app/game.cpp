@@ -36,7 +36,6 @@ export class Game
         }
     };
     std::array<Brick, N_LINES*N_COLS> m_bricks;
-    DynRect m_ball;
 
     struct Paddle
     {
@@ -48,14 +47,17 @@ export class Game
         {
             return {pos, SIZE};
         }
+        bool sticky{false};
     } m_paddle;
+    DynRect m_ball;
+    bool m_ball_stuck{true};
 
 public:
     explicit Game(const Size &world_size):
     m_size(world_size),
-    m_ball(Rect(Point(10,10), Size(10, 10)), {0.1, 0.3}),
     m_paddle(Point((m_size.w - Paddle::SIZE.w) / 2,
-                    m_size.h -Paddle::SIZE.h))
+                    m_size.h -Paddle::SIZE.h)),
+    m_ball(Rect(Point(m_paddle.rect().center().x,m_paddle.rect().top() - 11), Size(10, 10)), {-0.1, -0.3})
     {
         for(std::size_t i = 0; i < std::size(m_bricks); i++)
         {
@@ -87,87 +89,95 @@ public:
     {
         /*if(Keyboard::is_key_pressed(0x48))
             pos.y-=speed*elapsed;*/
+        int deltaX = 0;
         if(Keyboard::is_key_pressed(0x4B))
-            m_paddle.pos.x-=Paddle::speed*elapsed;
+            deltaX = -std::min<double>(Paddle::speed*elapsed, m_paddle.pos.x);
+
         if(Keyboard::is_key_pressed(0x4D))
-            m_paddle.pos.x+=Paddle::speed*elapsed;
+            deltaX = +std::min<double>(Paddle::speed*elapsed, m_size.w - Paddle::SIZE.w - m_paddle.pos.x);
+
+
         /*if(Keyboard::is_key_pressed(0x50))
             pos.y+=speed*elapsed;*/
-        if(m_paddle.pos.x < 0) m_paddle.pos.x = 0;
-        if(m_paddle.pos.x + Paddle::SIZE.w >= m_size.w) m_paddle.pos.x = m_size.w - Paddle::SIZE.w;
-        /*if(pos.y < 0) pos.y = 0;
-        if(pos.y + 100 >= m_size.h) pos.y = m_size.h - 100;*/
 
+        if(Keyboard::is_key_pressed(0x39))
+            m_ball_stuck = false;
 
+        m_paddle.pos.x+=deltaX;
+        if(m_ball_stuck)
+            m_ball.r.m_top_left.x += deltaX;
+        else
         {
-            auto remaining = elapsed;
-            while(remaining)
             {
-                auto collision = test_collision(m_ball, m_paddle.rect(), remaining);
-
-                bool paddleColision = collision.has_value();
-
-                Brick *b= nullptr;
-                for(auto &brick: m_bricks)
+                auto remaining = elapsed;
+                while(remaining)
                 {
-                    if(brick.health)
+                    auto collision = test_collision(m_ball, m_paddle.rect(), remaining);
+
+                    bool paddleColision = collision.has_value();
+
+                    Brick *b= nullptr;
+                    for(auto &brick: m_bricks)
                     {
-                        const auto collision_candidate = test_collision(m_ball, brick.rect(), remaining);
-                        if(collision_candidate.has_value() && (!collision.has_value() || collision_candidate->t < collision->t))
+                        if(brick.health)
                         {
-                            collision = collision_candidate;
-                            b = &brick;
-                            paddleColision = false;
+                            const auto collision_candidate = test_collision(m_ball, brick.rect(), remaining);
+                            if(collision_candidate.has_value() && (!collision.has_value() || collision_candidate->t < collision->t))
+                            {
+                                collision = collision_candidate;
+                                b = &brick;
+                                paddleColision = false;
+                            }
                         }
                     }
-                }
-                if(b)
-                    b->health--;
+                    if(b)
+                        b->health--;
 
-                if(collision.has_value())
-                {
-                    m_ball = collision->r;
-                    remaining-=collision->t;
-                    if(paddleColision)
+                    if(collision.has_value())
                     {
-                        const auto mod = __builtin_sqrt(m_ball.speed.x * m_ball.speed.x + m_ball.speed.y * m_ball.speed.y);
-                        const auto angle = (m_ball.r.center() - m_paddle.rect().center()).x*std::numbers::pi_v<double> / m_paddle.rect().width();
-                        m_ball.speed.x = __builtin_sin(angle) * mod;
-                        m_ball.speed.y = -__builtin_cos(angle) * mod;
+                        m_ball = collision->r;
+                        remaining-=collision->t;
+                        if(paddleColision)
+                        {
+                            const auto mod = __builtin_sqrt(m_ball.speed.x * m_ball.speed.x + m_ball.speed.y * m_ball.speed.y);
+                            const auto angle = (m_ball.r.center() - m_paddle.rect().center()).x*std::numbers::pi_v<double> / m_paddle.rect().width();
+                            m_ball.speed.x = __builtin_sin(angle) * mod;
+                            m_ball.speed.y = -__builtin_cos(angle) * mod;
+                        }
+                        else
+                        {
+                            m_ball.speed.x *= 1.05;
+                            m_ball.speed.y *= 1.05;
+                        }
                     }
                     else
                     {
-                        m_ball.speed.x *= 1.05;
-                        m_ball.speed.y *= 1.05;
+                        m_ball.r.m_top_left += m_ball.speed * remaining;
+                        remaining = 0;
                     }
                 }
-                else
-                {
-                    m_ball.r.m_top_left += m_ball.speed * remaining;
-                    remaining = 0;
-                }
             }
-        }
 
 
-        if(m_ball.r.left() < 0)
-        {
-            m_ball.r.m_top_left.x = 0;
-            m_ball.speed.x = -m_ball.speed.x;
-        }
-        if(m_ball.r.right() >= m_size.w)
-        {
-            m_ball.r.m_top_left.x = m_size.w - m_ball.r.size.w;
-            m_ball.speed.x = -m_ball.speed.x;
-        }
-        if(m_ball.r.top() < 0)
-        {
-            m_ball.r.m_top_left.y = 0;
-            m_ball.speed.y = -m_ball.speed.y;
-        }
-        if(m_ball.r.bottom() >= m_size.h)
-        {
-            std::abort();
+            if(m_ball.r.left() < 0)
+            {
+                m_ball.r.m_top_left.x = 0;
+                m_ball.speed.x = -m_ball.speed.x;
+            }
+            if(m_ball.r.right() >= m_size.w)
+            {
+                m_ball.r.m_top_left.x = m_size.w - m_ball.r.size.w;
+                m_ball.speed.x = -m_ball.speed.x;
+            }
+            if(m_ball.r.top() < 0)
+            {
+                m_ball.r.m_top_left.y = 0;
+                m_ball.speed.y = -m_ball.speed.y;
+            }
+            if(m_ball.r.bottom() >= m_size.h)
+            {
+                std::abort();
+            }
         }
     }
 };
