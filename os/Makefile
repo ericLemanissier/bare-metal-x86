@@ -89,9 +89,6 @@ $(STDLIB_MODULES): %.gcm:
 
 $(OBJS): $(STDLIB_MODULES)
 
-$(ARCHDIR)/isr.o: $(ARCHDIR)/isr.cpp
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -mno-red-zone -mgeneral-regs-only -c -o $@ $<
-
 clean:
 	$(RM) myos.kernel
 	$(RM) $(OBJS) *.o */*.o */*/*.o

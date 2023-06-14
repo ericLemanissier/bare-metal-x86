@@ -31,7 +31,7 @@ public:
 
 private:
 
-    alignas(64) static std::array<uint32_t, MAX_WIDTH * MAX_HEIGHT * BPP / 32> buf;
+    alignas(512) static std::array<uint32_t, MAX_WIDTH * MAX_HEIGHT * BPP / 32> buf;
 
     uint64_t framebuffer_addr{};
     uint32_t framebuffer_pitch{};
@@ -173,17 +173,17 @@ public:
 
     void clear_screen()
     {
-        std::fill_n(reinterpret_cast<std::byte*>(buf.data()), framebuffer_width*framebuffer_height * 4, std::byte{});
+        std::ranges::fill(buf, 0);
     }
 
     void fill_screen(uint32_t color)
     {
-        std::fill_n(buf.data(), framebuffer_width*framebuffer_height, color);
+        std::ranges::fill(buf, color);
     }
 
     void update_screen()
     {
-        std::copy_n(buf.data(), framebuffer_width*framebuffer_height, reinterpret_cast<uint32_t*>(this->framebuffer_addr));
+        std::ranges::copy(buf, reinterpret_cast<uint32_t*>(this->framebuffer_addr));
 
     }
 
@@ -210,4 +210,4 @@ public:
     }
 };
 
-std::array<uint32_t, Pixel::MAX_WIDTH * Pixel::MAX_HEIGHT * Pixel::BPP / 32> Pixel::buf = {};
+alignas(512) std::array<uint32_t, Pixel::MAX_WIDTH * Pixel::MAX_HEIGHT * Pixel::BPP / 32> Pixel::buf = {};

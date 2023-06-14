@@ -10,9 +10,9 @@ export EXEC_PREFIX=$(PREFIX)
 export BOOTDIR=/boot
 export LIBDIR=$(EXEC_PREFIX)/lib
 
-export CFLAGS=-O3 -g -march=pentium3 -msse
+export CFLAGS=-O3 -g -march=nehalem
 export CPPFLAGS=
-export CXXFLAGS=-O3 -g -march=pentium3 -msse
+export CXXFLAGS=-O3 -g -march=nehalem
 
 # Configure the cross-compiler to use the desired system root.
 export SYSROOT=$(shell pwd)/sysroot
@@ -46,4 +46,4 @@ myos.iso: sysroot/boot/myos.kernel grub.cfg
 	grub-mkrescue -o $@ isodir
 
 qemu: myos.iso
-	qemu-system-i386 -cdrom $< -serial stdio
+	qemu-system-x86_64 -cpu Nehalem-v1 -cdrom $< -serial stdio

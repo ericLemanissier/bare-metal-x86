@@ -30,10 +30,11 @@ import pixel;
 import ticks;
 import game;
 
+extern "C" void enable_sse();
+
 void kernel_main(const multiboot_info *multiboot_info_pointer, uint32_t multiboot_magic_value)
 {
-    terminal_clear();
-
+    enable_sse();
     init_gdt();
     init_idt();
     init_pic();
@@ -60,6 +61,7 @@ void kernel_main(const multiboot_info *multiboot_info_pointer, uint32_t multiboo
 
     //puts("Hello from puts\n   and it works!\n");
 
+    terminal_clear();
     terminal_writestring("Hello, kernel World!\n");
     terminal_setcolor(VGA_COLOR_BLUE | VGA_COLOR_WHITE << 4);
     terminal_writestring("how are you doing ?\n I'm doing fine\n");

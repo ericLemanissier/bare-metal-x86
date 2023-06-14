@@ -64,7 +64,7 @@
                 "command": "qemu-system-i386 -S -gdb tcp::1234 -boot d -cdrom bin/myos.iso -m 512"
             },
             "linux": {
-                "command": "qemu-system-i386 -S -gdb tcp::1234 -cdrom myos.iso -serial stdio"
+                "command": "qemu-system-x86_64 -cpu Nehalem-v1 -S -gdb tcp::1234 -cdrom myos.iso -serial stdio -m 32"
             }
         }
     ]

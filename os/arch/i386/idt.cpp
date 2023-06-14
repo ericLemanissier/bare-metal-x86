@@ -1,10 +1,12 @@
 export module idt;
 
 import <cstdint>;
+import <cstdlib>;
 import ll;
-import isr;
-
-
+import debug;
+import serial;
+import ticks;
+import keyboard;
 
 /* Descripteur de segment */
 struct idtdesc {
@@ -20,7 +22,7 @@ constexpr auto INTGATE = 0x8E00;		/* utilise pour gerer les interruptions */
 constexpr auto TRAPGATE = 0xEF00;		/* utilise pour faire des appels systemes */
 
 
-idtdesc 	kidt[IDTSIZE]; 		/* IDT table */
+idtdesc 	kidt[IDTSIZE]{}; 		/* IDT table */
 
 void init_idt_desc(uint16_t select, uint32_t offset, uint16_t type, struct idtdesc *desc)
 {
@@ -30,32 +32,564 @@ void init_idt_desc(uint16_t select, uint32_t offset, uint16_t type, struct idtde
     desc->offset16_31 = (offset & 0xffff0000u) >> 16u;
     return;
 }
+#define DECL_ISR(i) extern "C" void _isr_##i()
+    DECL_ISR(0);
+    DECL_ISR(1);
+    DECL_ISR(2);
+    DECL_ISR(3);
+    DECL_ISR(4);
+    DECL_ISR(5);
+    DECL_ISR(6);
+    DECL_ISR(7);
+    DECL_ISR(8);
+    DECL_ISR(9);
+    DECL_ISR(10);
+    DECL_ISR(11);
+    DECL_ISR(12);
+    DECL_ISR(13);
+    DECL_ISR(14);
+    DECL_ISR(15);
+    DECL_ISR(16);
+    DECL_ISR(17);
+    DECL_ISR(18);
+    DECL_ISR(19);
+    DECL_ISR(20);
+    DECL_ISR(21);
+    DECL_ISR(22);
+    DECL_ISR(23);
+    DECL_ISR(24);
+    DECL_ISR(25);
+    DECL_ISR(26);
+    DECL_ISR(27);
+    DECL_ISR(28);
+    DECL_ISR(29);
+    DECL_ISR(30);
+    DECL_ISR(31);
+    DECL_ISR(32);
+    DECL_ISR(33);
+    DECL_ISR(34);
+    DECL_ISR(35);
+    DECL_ISR(36);
+    DECL_ISR(37);
+    DECL_ISR(38);
+    DECL_ISR(39);
+    DECL_ISR(40);
+    DECL_ISR(41);
+    DECL_ISR(42);
+    DECL_ISR(43);
+    DECL_ISR(44);
+    DECL_ISR(45);
+    DECL_ISR(46);
+    DECL_ISR(47);
+    DECL_ISR(48);
+    DECL_ISR(49);
+    DECL_ISR(50);
+    DECL_ISR(51);
+    DECL_ISR(52);
+    DECL_ISR(53);
+    DECL_ISR(54);
+    DECL_ISR(55);
+    DECL_ISR(56);
+    DECL_ISR(57);
+    DECL_ISR(58);
+    DECL_ISR(59);
+    DECL_ISR(60);
+    DECL_ISR(61);
+    DECL_ISR(62);
+    DECL_ISR(63);
+    DECL_ISR(64);
+    DECL_ISR(65);
+    DECL_ISR(66);
+    DECL_ISR(67);
+    DECL_ISR(68);
+    DECL_ISR(69);
+    DECL_ISR(70);
+    DECL_ISR(71);
+    DECL_ISR(72);
+    DECL_ISR(73);
+    DECL_ISR(74);
+    DECL_ISR(75);
+    DECL_ISR(76);
+    DECL_ISR(77);
+    DECL_ISR(78);
+    DECL_ISR(79);
+    DECL_ISR(80);
+    DECL_ISR(81);
+    DECL_ISR(82);
+    DECL_ISR(83);
+    DECL_ISR(84);
+    DECL_ISR(85);
+    DECL_ISR(86);
+    DECL_ISR(87);
+    DECL_ISR(88);
+    DECL_ISR(89);
+    DECL_ISR(90);
+    DECL_ISR(91);
+    DECL_ISR(92);
+    DECL_ISR(93);
+    DECL_ISR(94);
+    DECL_ISR(95);
+    DECL_ISR(96);
+    DECL_ISR(97);
+    DECL_ISR(98);
+    DECL_ISR(99);
+    DECL_ISR(100);
+    DECL_ISR(101);
+    DECL_ISR(102);
+    DECL_ISR(103);
+    DECL_ISR(104);
+    DECL_ISR(105);
+    DECL_ISR(106);
+    DECL_ISR(107);
+    DECL_ISR(108);
+    DECL_ISR(109);
+    DECL_ISR(110);
+    DECL_ISR(111);
+    DECL_ISR(112);
+    DECL_ISR(113);
+    DECL_ISR(114);
+    DECL_ISR(115);
+    DECL_ISR(116);
+    DECL_ISR(117);
+    DECL_ISR(118);
+    DECL_ISR(119);
+    DECL_ISR(120);
+    DECL_ISR(121);
+    DECL_ISR(122);
+    DECL_ISR(123);
+    DECL_ISR(124);
+    DECL_ISR(125);
+    DECL_ISR(126);
+    DECL_ISR(127);
+    DECL_ISR(128);
+    DECL_ISR(129);
+    DECL_ISR(130);
+    DECL_ISR(131);
+    DECL_ISR(132);
+    DECL_ISR(133);
+    DECL_ISR(134);
+    DECL_ISR(135);
+    DECL_ISR(136);
+    DECL_ISR(137);
+    DECL_ISR(138);
+    DECL_ISR(139);
+    DECL_ISR(140);
+    DECL_ISR(141);
+    DECL_ISR(142);
+    DECL_ISR(143);
+    DECL_ISR(144);
+    DECL_ISR(145);
+    DECL_ISR(146);
+    DECL_ISR(147);
+    DECL_ISR(148);
+    DECL_ISR(149);
+    DECL_ISR(150);
+    DECL_ISR(151);
+    DECL_ISR(152);
+    DECL_ISR(153);
+    DECL_ISR(154);
+    DECL_ISR(155);
+    DECL_ISR(156);
+    DECL_ISR(157);
+    DECL_ISR(158);
+    DECL_ISR(159);
+    DECL_ISR(160);
+    DECL_ISR(161);
+    DECL_ISR(162);
+    DECL_ISR(163);
+    DECL_ISR(164);
+    DECL_ISR(165);
+    DECL_ISR(166);
+    DECL_ISR(167);
+    DECL_ISR(168);
+    DECL_ISR(169);
+    DECL_ISR(170);
+    DECL_ISR(171);
+    DECL_ISR(172);
+    DECL_ISR(173);
+    DECL_ISR(174);
+    DECL_ISR(175);
+    DECL_ISR(176);
+    DECL_ISR(177);
+    DECL_ISR(178);
+    DECL_ISR(179);
+    DECL_ISR(180);
+    DECL_ISR(181);
+    DECL_ISR(182);
+    DECL_ISR(183);
+    DECL_ISR(184);
+    DECL_ISR(185);
+    DECL_ISR(186);
+    DECL_ISR(187);
+    DECL_ISR(188);
+    DECL_ISR(189);
+    DECL_ISR(190);
+    DECL_ISR(191);
+    DECL_ISR(192);
+    DECL_ISR(193);
+    DECL_ISR(194);
+    DECL_ISR(195);
+    DECL_ISR(196);
+    DECL_ISR(197);
+    DECL_ISR(198);
+    DECL_ISR(199);
+    DECL_ISR(200);
+    DECL_ISR(201);
+    DECL_ISR(202);
+    DECL_ISR(203);
+    DECL_ISR(204);
+    DECL_ISR(205);
+    DECL_ISR(206);
+    DECL_ISR(207);
+    DECL_ISR(208);
+    DECL_ISR(209);
+    DECL_ISR(210);
+    DECL_ISR(211);
+    DECL_ISR(212);
+    DECL_ISR(213);
+    DECL_ISR(214);
+    DECL_ISR(215);
+    DECL_ISR(216);
+    DECL_ISR(217);
+    DECL_ISR(218);
+    DECL_ISR(219);
+    DECL_ISR(220);
+    DECL_ISR(221);
+    DECL_ISR(222);
+    DECL_ISR(223);
+    DECL_ISR(224);
+    DECL_ISR(225);
+    DECL_ISR(226);
+    DECL_ISR(227);
+    DECL_ISR(228);
+    DECL_ISR(229);
+    DECL_ISR(230);
+    DECL_ISR(231);
+    DECL_ISR(232);
+    DECL_ISR(233);
+    DECL_ISR(234);
+    DECL_ISR(235);
+    DECL_ISR(236);
+    DECL_ISR(237);
+    DECL_ISR(238);
+    DECL_ISR(239);
+    DECL_ISR(240);
+    DECL_ISR(241);
+    DECL_ISR(242);
+    DECL_ISR(243);
+    DECL_ISR(244);
+    DECL_ISR(245);
+    DECL_ISR(246);
+    DECL_ISR(247);
+    DECL_ISR(248);
+    DECL_ISR(249);
+    DECL_ISR(250);
+    DECL_ISR(251);
+    DECL_ISR(252);
+    DECL_ISR(253);
+    DECL_ISR(254);
+    DECL_ISR(255);
+#undef DECL_ISR
 
 export void init_idt(void)
 {
     /* Init irq */
-    for (auto &e : kidt)
-    {
-        init_idt_desc(0x08, (uint32_t)isr_schedule_int, 0, &e);
-    }
 
-    /* Vectors  0 -> 31 are for exceptions */
-    init_idt_desc(0x08, (uint32_t) isr_DF_exc, INTGATE, &kidt[8]);		/* #DF */
+    #define DECL_ISR(i) init_idt_desc(0x08, (uint32_t)_isr_##i, INTGATE, &kidt[i])
 
-    init_idt_desc(0x08, (uint32_t) isr_GP_exc, INTGATE, &kidt[13]);		/* #GP */
-    init_idt_desc(0x08, (uint32_t) isr_PF_exc, INTGATE, &kidt[14]);     /* #PF */
-
-    init_idt_desc(0x08, (uint32_t) isr_MF_exc, INTGATE, &kidt[16]);		/* #MF */
-    init_idt_desc(0x08, (uint32_t) isr_AC_exc, INTGATE, &kidt[17]);		/* #AC */
-    init_idt_desc(0x08, (uint32_t) isr_DF_exc, INTGATE, &kidt[18]);		/* #DF */
-    init_idt_desc(0x08, (uint32_t) isr_XMXF_exc, INTGATE, &kidt[19]);		/* #XMXF */
-
-    init_idt_desc(0x08, (uint32_t) isr_timer_int, INTGATE, &kidt[32]);
-    init_idt_desc(0x08, (uint32_t) keyboard_isr, INTGATE, &kidt[33]);
-
-    //init_idt_desc(0x08, (uint32_t) do_syscalls, TRAPGATE, &kidt[48]);
-    //init_idt_desc(0x08, (uint32_t) do_syscalls, TRAPGATE, &kidt[128]); //48
+    DECL_ISR(0);
+    DECL_ISR(1);
+    DECL_ISR(2);
+    DECL_ISR(3);
+    DECL_ISR(4);
+    DECL_ISR(5);
+    DECL_ISR(6);
+    DECL_ISR(7);
+    DECL_ISR(8);
+    DECL_ISR(9);
+    DECL_ISR(10);
+    DECL_ISR(11);
+    DECL_ISR(12);
+    DECL_ISR(13);
+    DECL_ISR(14);
+    DECL_ISR(15);
+    DECL_ISR(16);
+    DECL_ISR(17);
+    DECL_ISR(18);
+    DECL_ISR(19);
+    DECL_ISR(20);
+    DECL_ISR(21);
+    DECL_ISR(22);
+    DECL_ISR(23);
+    DECL_ISR(24);
+    DECL_ISR(25);
+    DECL_ISR(26);
+    DECL_ISR(27);
+    DECL_ISR(28);
+    DECL_ISR(29);
+    DECL_ISR(30);
+    DECL_ISR(31);
+    DECL_ISR(32);
+    DECL_ISR(33);
+    DECL_ISR(34);
+    DECL_ISR(35);
+    DECL_ISR(36);
+    DECL_ISR(37);
+    DECL_ISR(38);
+    DECL_ISR(39);
+    DECL_ISR(40);
+    DECL_ISR(41);
+    DECL_ISR(42);
+    DECL_ISR(43);
+    DECL_ISR(44);
+    DECL_ISR(45);
+    DECL_ISR(46);
+    DECL_ISR(47);
+    DECL_ISR(48);
+    DECL_ISR(49);
+    DECL_ISR(50);
+    DECL_ISR(51);
+    DECL_ISR(52);
+    DECL_ISR(53);
+    DECL_ISR(54);
+    DECL_ISR(55);
+    DECL_ISR(56);
+    DECL_ISR(57);
+    DECL_ISR(58);
+    DECL_ISR(59);
+    DECL_ISR(60);
+    DECL_ISR(61);
+    DECL_ISR(62);
+    DECL_ISR(63);
+    DECL_ISR(64);
+    DECL_ISR(65);
+    DECL_ISR(66);
+    DECL_ISR(67);
+    DECL_ISR(68);
+    DECL_ISR(69);
+    DECL_ISR(70);
+    DECL_ISR(71);
+    DECL_ISR(72);
+    DECL_ISR(73);
+    DECL_ISR(74);
+    DECL_ISR(75);
+    DECL_ISR(76);
+    DECL_ISR(77);
+    DECL_ISR(78);
+    DECL_ISR(79);
+    DECL_ISR(80);
+    DECL_ISR(81);
+    DECL_ISR(82);
+    DECL_ISR(83);
+    DECL_ISR(84);
+    DECL_ISR(85);
+    DECL_ISR(86);
+    DECL_ISR(87);
+    DECL_ISR(88);
+    DECL_ISR(89);
+    DECL_ISR(90);
+    DECL_ISR(91);
+    DECL_ISR(92);
+    DECL_ISR(93);
+    DECL_ISR(94);
+    DECL_ISR(95);
+    DECL_ISR(96);
+    DECL_ISR(97);
+    DECL_ISR(98);
+    DECL_ISR(99);
+    DECL_ISR(100);
+    DECL_ISR(101);
+    DECL_ISR(102);
+    DECL_ISR(103);
+    DECL_ISR(104);
+    DECL_ISR(105);
+    DECL_ISR(106);
+    DECL_ISR(107);
+    DECL_ISR(108);
+    DECL_ISR(109);
+    DECL_ISR(110);
+    DECL_ISR(111);
+    DECL_ISR(112);
+    DECL_ISR(113);
+    DECL_ISR(114);
+    DECL_ISR(115);
+    DECL_ISR(116);
+    DECL_ISR(117);
+    DECL_ISR(118);
+    DECL_ISR(119);
+    DECL_ISR(120);
+    DECL_ISR(121);
+    DECL_ISR(122);
+    DECL_ISR(123);
+    DECL_ISR(124);
+    DECL_ISR(125);
+    DECL_ISR(126);
+    DECL_ISR(127);
+    DECL_ISR(128);
+    DECL_ISR(129);
+    DECL_ISR(130);
+    DECL_ISR(131);
+    DECL_ISR(132);
+    DECL_ISR(133);
+    DECL_ISR(134);
+    DECL_ISR(135);
+    DECL_ISR(136);
+    DECL_ISR(137);
+    DECL_ISR(138);
+    DECL_ISR(139);
+    DECL_ISR(140);
+    DECL_ISR(141);
+    DECL_ISR(142);
+    DECL_ISR(143);
+    DECL_ISR(144);
+    DECL_ISR(145);
+    DECL_ISR(146);
+    DECL_ISR(147);
+    DECL_ISR(148);
+    DECL_ISR(149);
+    DECL_ISR(150);
+    DECL_ISR(151);
+    DECL_ISR(152);
+    DECL_ISR(153);
+    DECL_ISR(154);
+    DECL_ISR(155);
+    DECL_ISR(156);
+    DECL_ISR(157);
+    DECL_ISR(158);
+    DECL_ISR(159);
+    DECL_ISR(160);
+    DECL_ISR(161);
+    DECL_ISR(162);
+    DECL_ISR(163);
+    DECL_ISR(164);
+    DECL_ISR(165);
+    DECL_ISR(166);
+    DECL_ISR(167);
+    DECL_ISR(168);
+    DECL_ISR(169);
+    DECL_ISR(170);
+    DECL_ISR(171);
+    DECL_ISR(172);
+    DECL_ISR(173);
+    DECL_ISR(174);
+    DECL_ISR(175);
+    DECL_ISR(176);
+    DECL_ISR(177);
+    DECL_ISR(178);
+    DECL_ISR(179);
+    DECL_ISR(180);
+    DECL_ISR(181);
+    DECL_ISR(182);
+    DECL_ISR(183);
+    DECL_ISR(184);
+    DECL_ISR(185);
+    DECL_ISR(186);
+    DECL_ISR(187);
+    DECL_ISR(188);
+    DECL_ISR(189);
+    DECL_ISR(190);
+    DECL_ISR(191);
+    DECL_ISR(192);
+    DECL_ISR(193);
+    DECL_ISR(194);
+    DECL_ISR(195);
+    DECL_ISR(196);
+    DECL_ISR(197);
+    DECL_ISR(198);
+    DECL_ISR(199);
+    DECL_ISR(200);
+    DECL_ISR(201);
+    DECL_ISR(202);
+    DECL_ISR(203);
+    DECL_ISR(204);
+    DECL_ISR(205);
+    DECL_ISR(206);
+    DECL_ISR(207);
+    DECL_ISR(208);
+    DECL_ISR(209);
+    DECL_ISR(210);
+    DECL_ISR(211);
+    DECL_ISR(212);
+    DECL_ISR(213);
+    DECL_ISR(214);
+    DECL_ISR(215);
+    DECL_ISR(216);
+    DECL_ISR(217);
+    DECL_ISR(218);
+    DECL_ISR(219);
+    DECL_ISR(220);
+    DECL_ISR(221);
+    DECL_ISR(222);
+    DECL_ISR(223);
+    DECL_ISR(224);
+    DECL_ISR(225);
+    DECL_ISR(226);
+    DECL_ISR(227);
+    DECL_ISR(228);
+    DECL_ISR(229);
+    DECL_ISR(230);
+    DECL_ISR(231);
+    DECL_ISR(232);
+    DECL_ISR(233);
+    DECL_ISR(234);
+    DECL_ISR(235);
+    DECL_ISR(236);
+    DECL_ISR(237);
+    DECL_ISR(238);
+    DECL_ISR(239);
+    DECL_ISR(240);
+    DECL_ISR(241);
+    DECL_ISR(242);
+    DECL_ISR(243);
+    DECL_ISR(244);
+    DECL_ISR(245);
+    DECL_ISR(246);
+    DECL_ISR(247);
+    DECL_ISR(248);
+    DECL_ISR(249);
+    DECL_ISR(250);
+    DECL_ISR(251);
+    DECL_ISR(252);
+    DECL_ISR(253);
+    DECL_ISR(254);
+    DECL_ISR(255);
+    #undef DECL_ISR
 
 
     lidt(kidt, IDTSIZE * 8);
+}
+
+
+typedef void (*ISRHandler)();
+
+ISRHandler g_ISRHandlers[256]{};
+
+extern "C" void i686_ISR_Handler(uint32_t interrupt)
+{
+    if(interrupt > 256)
+    {
+        debug("exception too high");
+        write_serial(interrupt);write_serial("\n");
+        debug("KERNEL PANIC!");
+        std::abort();
+    }
+    if (g_ISRHandlers[interrupt] != NULL)
+        g_ISRHandlers[interrupt]();
+    else if(interrupt == 32) inc_ticks();
+    else if(interrupt == 33) Keyboard::interrupt(inb(0x60));
+    else if (interrupt >= 32){
+        debug("Unhandled interrupt !");
+        write_serial(interrupt);write_serial("\n");
+    }
+    else
+    {
+        debug("Unhandled exception");
+        write_serial(interrupt);write_serial("\n");
+        debug("KERNEL PANIC!");
+
+        std::abort();
+    }
+    outb(0x20,0x20);
+    outb(0xA0,0x20);
+
 }
