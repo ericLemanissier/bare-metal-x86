@@ -108,6 +108,7 @@ void kernel_main(const multiboot_info *multiboot_info_pointer, uint32_t multiboo
         if(pixel_screen.should_repaint())
         {
             pixel_screen.update_screen();
+            if(g.is_finished()) break;
         }
     }
 }

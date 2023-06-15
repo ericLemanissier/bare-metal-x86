@@ -31,6 +31,13 @@ export struct Size
         h+=o.h;
         return *this;
     }
+
+    Size& operator-=(Size o)
+    {
+        w -= o.w;
+        h -= o.h;
+        return *this;
+    }
 };
 
 export struct Point

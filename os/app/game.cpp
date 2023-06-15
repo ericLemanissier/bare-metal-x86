@@ -4,6 +4,7 @@ import <cstdint>;
 import <numbers>;
 import <array>;
 import <cstdlib>;
+import <algorithm>;
 import geom;
 import pixel;
 import keyboard;
@@ -11,7 +12,7 @@ import collision;
 
 export class Game
 {
-    static constexpr int N_LINES = 2;
+    static constexpr int N_LINES = 3;
     static constexpr int N_COLS = 10;
     Size m_size{};
 
@@ -29,7 +30,7 @@ export class Game
         };
         Point pos{};
         Color color{};
-        int health{1};
+        int health{3};
         Rect rect() const
         {
             return {pos, SIZE};
@@ -77,7 +78,17 @@ public:
         pixel_screen.fill_rect(m_paddle.rect(), Paddle::color);
 
         for(const auto &b:m_bricks)
-            if(b.health) pixel_screen.fill_rect(Rect{b.pos, Brick::SIZE}, b.color);
+            if(b.health)
+            {
+                Rect r = {b.pos, Brick::SIZE};
+                for(int i = 0; i < b.health; i++)
+                {
+                    pixel_screen.draw_rect(r, WHITE);
+                    r.m_top_left += Delta(1,1);
+                    r.size -= Size(2,2);
+                }
+                pixel_screen.fill_rect(r, b.color);
+            }
 
         pixel_screen.fill_circle(Point(
             m_ball.r.center().x,
@@ -144,7 +155,7 @@ public:
                             m_ball.speed.x = __builtin_sin(angle) * mod;
                             m_ball.speed.y = -__builtin_cos(angle) * mod;
                         }
-                        else
+                        else if(b->health == 0)
                         {
                             m_ball.speed.x *= 1.05;
                             m_ball.speed.y *= 1.05;
@@ -179,5 +190,10 @@ public:
                 std::abort();
             }
         }
+    }
+
+    bool is_finished() const
+    {
+        return std::ranges::all_of(m_bricks, [](const auto h){return h == 0;}, &Brick::health);
     }
 };
