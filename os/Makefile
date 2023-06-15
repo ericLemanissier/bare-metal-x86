@@ -31,6 +31,7 @@ LDFLAGS+= $(KERNEL_ARCH_LDFLAGS)
 LIBS+= $(KERNEL_ARCH_LIBS)
 
 KERNEL_OBJS=\
+kernel/unroll.o \
 kernel/memmove.o \
 kernel/memset.o \
 kernel/memcpy.o \
@@ -47,6 +48,8 @@ kernel/kernel.o \
 
 STDLIB_MODULES=\
 $(KERNEL_STD_MODULES) \
+type_traits.gcm \
+utility.gcm \
 cstddef.gcm \
 cstdint.gcm \
 source_location.gcm \
@@ -86,6 +89,9 @@ $(ARCHDIR)/crtbegin.o $(ARCHDIR)/crtend.o:
 
 $(STDLIB_MODULES): %.gcm:
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -xc++-system-header $*
+
+$(ARCHDIR)/isr.o: $(ARCHDIR)/isr.cpp
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -fno-modules-ts -mno-red-zone -mgeneral-regs-only -c -o $@ $<
 
 $(OBJS): $(STDLIB_MODULES)
 
