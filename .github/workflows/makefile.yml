@@ -22,7 +22,7 @@ jobs:
       working-directory: toolchain
 
     - name: install os dependencies
-      run: sudo apt-get install -y mtools
+      run: sudo apt-get install -y mtools xorriso
 
     - name: make ISO
       run: make
