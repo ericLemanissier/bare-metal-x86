@@ -1,7 +1,4 @@
-export module abort;
-
-
-extern "C" export void abort()
+extern "C" void abort()
 {
     asm volatile("cli");
     asm volatile("hlt");
