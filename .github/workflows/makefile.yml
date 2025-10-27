@@ -27,7 +27,7 @@ jobs:
     - name: make ISO
       run: make
 
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v5
       with:
         name: myos
         path: |
